@@ -39,3 +39,14 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# AI agent directories
+.agents/
+.claude/
+.cursor/
+.devin/
+.kilo/
+
+# Database
+*.db
+*.db-journal

@@ -1,0 +1,110 @@
+// Prisma Schema for Money Tracker Web
+// Database: SQLite (local file)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// MASTER DATA TABLES
+// ============================================
+
+// Categories for transactions (Income & Expense)
+model Category {
+  id          Int      @id @default(autoincrement())
+  name        String
+  type        String   // "income" or "expense"
+  icon        String?  // emoji or icon name
+  color       String?  // hex color for UI
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  transactions Transaction[]
+
+  @@map("categories")
+}
+
+// ============================================
+// REIMBURSEMENT OFFICE CATEGORIES
+// ============================================
+
+model ReimbursementCategory {
+  id          Int      @id @default(autoincrement())
+  name        String
+  icon        String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  reimbursements Reimbursement[]
+
+  @@map("reimbursement_categories")
+}
+
+// ============================================
+// TRANSACTIONS (Main Book)
+// ============================================
+
+model Transaction {
+  id          Int      @id @default(autoincrement())
+  date        DateTime
+  categoryId  Int
+  description String
+  income      Float    @default(0)
+  expense     Float    @default(0)
+  balance     Float?
+  isSaving    Boolean  @default(false)
+  savingsLocation String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  category      Category @relation(fields: [categoryId], references: [id])
+  reimbursement Reimbursement?
+
+  @@index([date])
+  @@index([categoryId])
+  @@map("transactions")
+}
+
+// ============================================
+// REIMBURSEMENT MODULE (Simple)
+// ============================================
+
+model Reimbursement {
+  id              Int      @id @default(autoincrement())
+  transactionId   Int      @unique
+  officeCategoryId Int
+  receiptPhoto    String?  // File path to uploaded receipt
+  notes           String?
+  status          String   @default("pending") // "pending", "claimed"
+  claimedAt       DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  transaction     Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  officeCategory  ReimbursementCategory @relation(fields: [officeCategoryId], references: [id])
+
+  @@index([status])
+  @@index([transactionId])
+  @@map("reimbursements")
+}
+
+// ============================================
+// SETTINGS & PREFERENCES
+// ============================================
+
+model AppSettings {
+  id          Int      @id @default(autoincrement())
+  key         String   @unique
+  value       String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("app_settings")
+}
