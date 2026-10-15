@@ -24,24 +24,24 @@ export default function Toast({ id, message, type, duration = 3000, onClose }: T
 
   const styles = {
     success: {
-      bg: 'bg-green-500',
+      bg: 'bg-status-success',
       icon: '✓',
-      iconBg: 'bg-green-600',
+      iconBg: 'bg-status-success',
     },
     error: {
-      bg: 'bg-red-500',
+      bg: 'bg-status-danger',
       icon: '✕',
-      iconBg: 'bg-red-600',
+      iconBg: 'bg-status-danger',
     },
     warning: {
-      bg: 'bg-yellow-500',
+      bg: 'bg-status-warning',
       icon: '⚠',
-      iconBg: 'bg-yellow-600',
+      iconBg: 'bg-status-warning',
     },
     info: {
-      bg: 'bg-blue-500',
+      bg: 'bg-status-info',
       icon: 'ℹ',
-      iconBg: 'bg-blue-600',
+      iconBg: 'bg-status-info',
     },
   }
 

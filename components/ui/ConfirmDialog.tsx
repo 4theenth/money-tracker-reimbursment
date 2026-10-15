@@ -20,9 +20,9 @@ export default function ConfirmDialog({
   onCancel,
 }: ConfirmDialogProps) {
   const confirmStyles = {
-    danger: 'bg-red-600 hover:bg-red-700 text-white',
-    primary: 'bg-blue-600 hover:bg-blue-700 text-white',
-    success: 'bg-green-600 hover:bg-green-700 text-white',
+    danger: 'bg-action-delete hover:bg-action-delete-hover text-white',
+    primary: 'bg-brand-primary hover:bg-brand-primary-hover text-white',
+    success: 'bg-action-save hover:bg-action-save-hover text-white',
   }
 
   return (
@@ -52,7 +52,7 @@ export default function ConfirmDialog({
         <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex gap-3 justify-end">
           <button
             onClick={onCancel}
-            className="px-6 py-2.5 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+            className="px-6 py-2.5 bg-action-cancel hover:bg-action-cancel-hover text-white rounded-lg font-medium transition-colors"
           >
             {cancelLabel}
           </button>
