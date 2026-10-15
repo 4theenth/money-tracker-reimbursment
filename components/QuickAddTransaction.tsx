@@ -3,7 +3,9 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useNotification } from '@/contexts/NotificationContext'
+import Modal from '@/components/Modal'
 import ReimbursementFormFields from '@/components/ReimbursementFormFields'
+import SavingsLocationField from '@/components/SavingsLocationField'
 
 interface Category {
   id: number
@@ -21,7 +23,6 @@ export default function QuickAddTransaction({ onSuccess }: QuickAddProps) {
   const { showSuccess, showError } = useNotification()
   const [isOpen, setIsOpen] = useState(false)
   const [categories, setCategories] = useState<Category[]>([])
-  const [savingsLocations, setSavingsLocations] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
 
   const [formData, setFormData] = useState({
@@ -40,7 +41,6 @@ export default function QuickAddTransaction({ onSuccess }: QuickAddProps) {
   useEffect(() => {
     if (isOpen) {
       fetchCategories()
-      fetchSavingsLocations()
     }
   }, [isOpen])
 
@@ -51,16 +51,6 @@ export default function QuickAddTransaction({ onSuccess }: QuickAddProps) {
       setCategories(data)
     } catch (error) {
       console.error('Error fetching categories:', error)
-    }
-  }
-
-  const fetchSavingsLocations = async () => {
-    try {
-      const res = await fetch('/api/settings/savings-locations')
-      const data = await res.json()
-      setSavingsLocations(data.locations || [])
-    } catch (error) {
-      console.error('Error fetching savings locations:', error)
     }
   }
 
@@ -178,29 +168,13 @@ export default function QuickAddTransaction({ onSuccess }: QuickAddProps) {
       </button>
 
       {/* Modal */}
-      {isOpen && (
-        <div 
-          className="fixed inset-0 backdrop-blur-sm bg-white/30 dark:bg-black/30 flex items-center justify-center z-50 p-4 animate-fadeIn"
-          onClick={() => setIsOpen(false)}
-        >
-          <div 
-            className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto animate-scaleIn"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
-                  ➕ Tambah Transaksi Cepat
-                </h2>
-                <button
-                  onClick={() => setIsOpen(false)}
-                  className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-2xl"
-                >
-                  ×
-                </button>
-              </div>
-              
-              <form onSubmit={handleSubmit} className="space-y-4">
+      <Modal
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        title="➕ Tambah Transaksi Cepat"
+        maxWidth="md"
+      >
+        <form onSubmit={handleSubmit} className="space-y-4">
                 {/* Date */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -268,26 +242,11 @@ export default function QuickAddTransaction({ onSuccess }: QuickAddProps) {
 
                 {/* Savings Location - Show only for savings categories */}
                 {isSavingsCategory && (
-                  <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      💎 Lokasi Tabungan
-                    </label>
-                    <select
-                      value={formData.savingsLocation}
-                      onChange={(e) => setFormData({ ...formData, savingsLocation: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-                    >
-                      <option value="">Pilih Lokasi</option>
-                      {savingsLocations.map((loc) => (
-                        <option key={loc} value={loc}>
-                          {loc}
-                        </option>
-                      ))}
-                    </select>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      Opsional: Track tabungan di bank/dompet mana
-                    </p>
-                  </div>
+                  <SavingsLocationField
+                    value={formData.savingsLocation}
+                    onChange={(value) => setFormData({ ...formData, savingsLocation: value })}
+                    required={false}
+                  />
                 )}
 
                 {/* Description */}
@@ -354,10 +313,7 @@ export default function QuickAddTransaction({ onSuccess }: QuickAddProps) {
                   </button>
                 </div>
               </form>
-            </div>
-          </div>
-        </div>
-      )}
+            </Modal>
     </>
   )
 }
