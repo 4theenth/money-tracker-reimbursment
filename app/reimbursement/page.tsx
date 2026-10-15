@@ -5,6 +5,9 @@ import Link from 'next/link'
 import { useNotification } from '@/contexts/NotificationContext'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import ImageUpload from '@/components/ImageUpload'
+import ExportModal from '@/components/ExportModal'
+import CompanyManagementModal from '@/components/CompanyManagementModal'
+import DateRangePicker from '@/components/DateRangePicker'
 
 interface ReimbursementCategory {
   id: number
@@ -37,7 +40,7 @@ interface Reimbursement {
   receiptPhoto: string | null
   notes: string | null
   status: string
-  claimedAt: string | null
+  paidDate: string | null
   createdAt: string
   transaction: Transaction
   officeCategory: ReimbursementCategory
@@ -48,13 +51,15 @@ export default function ReimbursementPage() {
   const [reimbursements, setReimbursements] = useState<Reimbursement[]>([])
   const [loading, setLoading] = useState(true)
   
-  // Filters
-  const [filters, setFilters] = useState({
-    month: new Date().getMonth() + 1,
-    year: new Date().getFullYear(),
-    status: ''
-  })
+  // Date range filters (NEW)
+  const now = new Date()
+  const [startDate, setStartDate] = useState(new Date(now.getFullYear(), now.getMonth(), 1))
+  const [endDate, setEndDate] = useState(new Date(now.getFullYear(), now.getMonth() + 1, 0))
+  const [statusFilter, setStatusFilter] = useState('')
+  
   const [isFormOpen, setIsFormOpen] = useState(false)
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false)
+  const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false)
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split('T')[0],
     officeCategoryId: '',
@@ -68,7 +73,7 @@ export default function ReimbursementPage() {
   useEffect(() => {
     fetchReimbursements()
     fetchReimbursementCategories()
-  }, [filters])
+  }, [startDate, endDate, statusFilter])
 
   const fetchReimbursementCategories = async () => {
     try {
@@ -85,9 +90,11 @@ export default function ReimbursementPage() {
       setLoading(true)
       const params = new URLSearchParams()
       
-      if (filters.status) params.append('status', filters.status)
-      if (filters.month) params.append('month', filters.month.toString())
-      if (filters.year) params.append('year', filters.year.toString())
+      // NEW: Use date range
+      params.append('startDate', startDate.toISOString().split('T')[0])
+      params.append('endDate', endDate.toISOString().split('T')[0])
+      
+      if (statusFilter) params.append('status', statusFilter)
 
       const res = await fetch(`/api/reimbursements?${params}`)
       const data = await res.json()
@@ -101,18 +108,22 @@ export default function ReimbursementPage() {
   }
 
   const handleMarkAsClaimed = (reimbursement: Reimbursement) => {
+    const isPaid = reimbursement.status === 'paid'
+    
     confirm({
-      title: 'Tandai Sudah Dibayar',
-      message: `Tandai reimbursement "${reimbursement.transaction.description}" sebagai sudah dibayar?`,
-      confirmLabel: 'Ya, Sudah Dibayar',
+      title: isPaid ? 'Tandai Belum Dibayar' : 'Tandai Sudah Dibayar',
+      message: isPaid 
+        ? `Tandai reimbursement "${reimbursement.transaction.description}" sebagai belum dibayar?`
+        : `Tandai reimbursement "${reimbursement.transaction.description}" sebagai sudah dibayar?`,
+      confirmLabel: isPaid ? 'Ya, Belum Dibayar' : 'Ya, Sudah Dibayar',
       cancelLabel: 'Batal',
-      confirmVariant: 'success',
+      confirmVariant: isPaid ? 'warning' : 'success',
       onConfirm: async () => {
         try {
-          const res = await fetch(`/api/reimbursements/${reimbursement.id}`, {
-            method: 'PUT',
+          const res = await fetch(`/api/reimbursements/${reimbursement.id}/status`, {
+            method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ status: 'claimed' }),
+            body: JSON.stringify({ status: isPaid ? 'pending' : 'paid' }),
           })
 
           if (!res.ok) {
@@ -120,7 +131,7 @@ export default function ReimbursementPage() {
             return
           }
 
-          showSuccess('Status berhasil diupdate!')
+          showSuccess(isPaid ? 'Status diubah menjadi belum dibayar' : 'Status berhasil diupdate sebagai dibayar!')
           fetchReimbursements()
         } catch (error) {
           console.error('Error updating status:', error)
@@ -214,6 +225,44 @@ export default function ReimbursementPage() {
     }
   }
 
+  const handleExport = async (config: any, format: 'excel' | 'pdf') => {
+    try {
+      setIsExportModalOpen(false)
+      showSuccess(`Generating ${format.toUpperCase()} report...`)
+      
+      const apiEndpoint = format === 'excel' ? '/api/export/excel' : '/api/export/pdf'
+      const fileExtension = format === 'excel' ? 'xlsx' : 'pdf'
+      
+      // Call export API
+      const res = await fetch(apiEndpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(config)
+      })
+
+      if (!res.ok) {
+        const error = await res.json()
+        throw new Error(error.error || 'Export failed')
+      }
+
+      // Download file
+      const blob = await res.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `Reimbursement_${config.selectedMonth}.${fileExtension}`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+
+      showSuccess(`✅ ${format.toUpperCase()} berhasil di-export!`)
+    } catch (error: any) {
+      console.error('Export error:', error)
+      showError(error.message || 'Gagal export laporan')
+    }
+  }
+
   // Calculate summary
   const totalPending = reimbursements
     .filter(r => r.status === 'pending')
@@ -238,11 +287,6 @@ export default function ReimbursementPage() {
 
   const pendingReimbursements = reimbursements.filter(r => r.status === 'pending')
   const claimedReimbursements = reimbursements.filter(r => r.status === 'claimed')
-
-  const months = [
-    'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-    'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
-  ]
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4 md:p-8">
@@ -270,13 +314,25 @@ export default function ReimbursementPage() {
           <div className="flex gap-2">
             <button
               onClick={() => setIsFormOpen(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold shadow-lg transition-colors"
+              className="bg-brand-primary hover:bg-brand-primary-hover text-white px-6 py-3 rounded-lg font-semibold shadow-lg transition-colors"
             >
               ➕ Tambah Reimbursement
             </button>
             <button
-              onClick={() => {/* TODO: Export */}}
-              className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold shadow-lg transition-colors"
+              onClick={() => setIsCompanyModalOpen(true)}
+              className="bg-brand-secondary hover:bg-brand-secondary-hover text-white px-6 py-3 rounded-lg font-semibold shadow-lg transition-colors"
+            >
+              🏢 Kelola Perusahaan
+            </button>
+            <Link
+              href="/kategori"
+              className="bg-brand-secondary hover:bg-brand-secondary-hover text-white px-6 py-3 rounded-lg font-semibold shadow-lg transition-colors text-center"
+            >
+              📂 Kelola Kategori
+            </Link>
+            <button
+              onClick={() => setIsExportModalOpen(true)}
+              className="bg-action-save hover:bg-action-save-hover text-white px-6 py-3 rounded-lg font-semibold shadow-lg transition-colors"
             >
               📄 Export Laporan
             </button>
@@ -287,32 +343,17 @@ export default function ReimbursementPage() {
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             
-            {/* Month Filter */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Bulan
-              </label>
-              <select
-                value={filters.month}
-                onChange={(e) => setFilters({ ...filters, month: parseInt(e.target.value) })}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
-              >
-                {months.map((month, idx) => (
-                  <option key={idx} value={idx + 1}>{month}</option>
-                ))}
-              </select>
-            </div>
-
-            {/* Year Filter */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Tahun
-              </label>
-              <input
-                type="number"
-                value={filters.year}
-                onChange={(e) => setFilters({ ...filters, year: parseInt(e.target.value) })}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
+            {/* Date Range Picker (replaces Month & Year) */}
+            <div className="md:col-span-2">
+              <DateRangePicker
+                startDate={startDate}
+                endDate={endDate}
+                onStartDateChange={setStartDate}
+                onEndDateChange={setEndDate}
+                onQuickFilter={(start, end) => {
+                  setStartDate(start)
+                  setEndDate(end)
+                }}
               />
             </div>
 
@@ -322,8 +363,8 @@ export default function ReimbursementPage() {
                 Status
               </label>
               <select
-                value={filters.status}
-                onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
               >
                 <option value="">Semua Status</option>
@@ -385,7 +426,7 @@ export default function ReimbursementPage() {
               {Object.entries(byCategory).map(([name, data]) => (
                 <div
                   key={name}
-                  className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4 border border-purple-200 dark:border-purple-700"
+                  className="bg-brand-secondary/10 dark:bg-brand-secondary/20 rounded-lg p-4 border border-brand-secondary/30"
                 >
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-2xl">{data.icon || '📦'}</span>
@@ -393,7 +434,7 @@ export default function ReimbursementPage() {
                       {name}
                     </span>
                   </div>
-                  <p className="text-lg font-bold text-purple-600 dark:text-purple-400">
+                  <p className="text-lg font-bold text-brand-secondary">
                     {formatCurrency(data.total)}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
@@ -429,9 +470,9 @@ export default function ReimbursementPage() {
                 <div
                   key={reimb.id}
                   className={`border rounded-lg p-4 ${
-                    reimb.status === 'claimed'
-                      ? 'bg-green-50 dark:bg-green-900/10 border-green-200 dark:border-green-800'
-                      : 'bg-yellow-50 dark:bg-yellow-900/10 border-yellow-200 dark:border-yellow-800'
+                    reimb.status === 'paid'
+                      ? 'bg-status-success-light border-status-success'
+                      : 'bg-status-warning-light border-status-warning'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-4">
@@ -477,29 +518,38 @@ export default function ReimbursementPage() {
                       
                       <div className="flex items-center gap-2 mb-2">
                         {reimb.status === 'pending' ? (
-                          <span className="text-xs bg-yellow-500 text-white px-2 py-1 rounded">
-                            ⏳ Pending
+                          <span className="text-xs bg-status-warning text-white px-2 py-1 rounded">
+                            🔴 Belum Lunas
                           </span>
                         ) : (
-                          <span className="text-xs bg-green-500 text-white px-2 py-1 rounded">
-                            ✅ Dibayar
-                          </span>
+                          <>
+                            <span className="text-xs bg-status-success text-white px-2 py-1 rounded">
+                              ✅ Lunas
+                            </span>
+                            {reimb.paidDate && (
+                              <span className="text-xs text-gray-500 dark:text-gray-400">
+                                {formatDate(reimb.paidDate)}
+                              </span>
+                            )}
+                          </>
                         )}
                       </div>
 
                       <div className="flex gap-2">
-                        {reimb.status === 'pending' && (
-                          <button
-                            onClick={() => handleMarkAsClaimed(reimb)}
-                            className="text-xs bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded"
-                          >
-                            ✓ Tandai Dibayar
-                          </button>
-                        )}
+                        <button
+                          onClick={() => handleMarkAsClaimed(reimb)}
+                          className={`text-xs px-3 py-1 rounded ${
+                            reimb.status === 'paid'
+                              ? 'bg-action-edit hover:bg-action-edit-hover text-white'
+                              : 'bg-action-save hover:bg-action-save-hover text-white'
+                          }`}
+                        >
+                          {reimb.status === 'paid' ? '↺ Tandai Belum Lunas' : '✓ Tandai Lunas'}
+                        </button>
                         
                         <button
                           onClick={() => handleDelete(reimb)}
-                          className="text-xs bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded"
+                          className="text-xs bg-action-delete hover:bg-action-delete-hover text-white px-3 py-1 rounded"
                         >
                           🗑️ Hapus
                         </button>
@@ -632,14 +682,14 @@ export default function ReimbursementPage() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+                    className="flex-1 bg-action-save hover:bg-action-save-hover disabled:bg-action-cancel text-white px-6 py-3 rounded-lg font-semibold transition-colors"
                   >
                     {loading ? 'Menyimpan...' : '💾 Simpan'}
                   </button>
                   <button
                     type="button"
                     onClick={() => setIsFormOpen(false)}
-                    className="px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg font-semibold hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                    className="px-6 py-3 bg-action-cancel hover:bg-action-cancel-hover text-white rounded-lg font-semibold transition-colors"
                   >
                     Batal
                   </button>
@@ -649,6 +699,22 @@ export default function ReimbursementPage() {
           </div>
         </div>
       )}
+
+      {/* Export Modal */}
+      <ExportModal
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        onExport={handleExport}
+        onManageCompanies={() => setIsCompanyModalOpen(true)}
+        startDate={startDate}
+        endDate={endDate}
+      />
+
+      {/* Company Management Modal */}
+      <CompanyManagementModal
+        isOpen={isCompanyModalOpen}
+        onClose={() => setIsCompanyModalOpen(false)}
+      />
     </div>
   )
 }
