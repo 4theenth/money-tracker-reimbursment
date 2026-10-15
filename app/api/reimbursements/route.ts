@@ -6,6 +6,10 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const status = searchParams.get('status')
+    const startDate = searchParams.get('startDate')
+    const endDate = searchParams.get('endDate')
+    
+    // Legacy support: month & year (deprecated, fallback only)
     const month = searchParams.get('month')
     const year = searchParams.get('year')
 
@@ -15,8 +19,27 @@ export async function GET(request: NextRequest) {
       where.status = status
     }
 
-    // Filter by month/year through transaction date
-    if (month || year) {
+    // Filter by date range (NEW: preferred method)
+    if (startDate || endDate) {
+      const dateFilter: any = {}
+      
+      if (startDate) {
+        dateFilter.gte = new Date(startDate)
+      }
+      
+      if (endDate) {
+        // Include the entire end date (23:59:59)
+        const endDateObj = new Date(endDate)
+        endDateObj.setHours(23, 59, 59, 999)
+        dateFilter.lte = endDateObj
+      }
+
+      where.transaction = {
+        date: dateFilter
+      }
+    }
+    // Legacy fallback: Filter by month/year
+    else if (month || year) {
       const dateFilter: any = {}
       
       if (year) {
