@@ -3,7 +3,9 @@
 import { useState, useEffect } from 'react'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { useNotification } from '@/contexts/NotificationContext'
+import Modal from '@/components/Modal'
 import ReimbursementFormFields from '@/components/ReimbursementFormFields'
+import SavingsLocationField from '@/components/SavingsLocationField'
 
 interface Category {
   id: number
@@ -29,7 +31,6 @@ export default function TransaksiPage() {
   const { showSuccess, showError, confirm } = useNotification()
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [categories, setCategories] = useState<Category[]>([])
-  const [savingsLocations, setSavingsLocations] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [editingId, setEditingId] = useState<number | null>(null)
@@ -57,7 +58,6 @@ export default function TransaksiPage() {
 
   useEffect(() => {
     fetchCategories()
-    fetchSavingsLocations()
     fetchTransactions()
   }, [filters])
 
@@ -68,16 +68,6 @@ export default function TransaksiPage() {
       setCategories(data)
     } catch (error) {
       console.error('Error fetching categories:', error)
-    }
-  }
-
-  const fetchSavingsLocations = async () => {
-    try {
-      const res = await fetch('/api/settings/savings-locations')
-      const data = await res.json()
-      setSavingsLocations(data.locations || [])
-    } catch (error) {
-      console.error('Error fetching savings locations:', error)
     }
   }
 
@@ -261,15 +251,22 @@ export default function TransaksiPage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-800 dark:text-white">💰 Transaksi</h1>
-            <p className="text-gray-600 dark:text-gray-300 mt-1">
-              Kelola pemasukan dan pengeluaran
-            </p>
-          </div>
-          <button
-            onClick={() => {
+        <div className="mb-6">
+          <a
+            href="/"
+            className="inline-flex items-center gap-2 text-brand-primary hover:text-brand-primary-hover font-medium mb-4 transition-colors"
+          >
+            ← Kembali ke Dashboard
+          </a>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-800 dark:text-white">💰 Transaksi</h1>
+              <p className="text-gray-600 dark:text-gray-300 mt-1">
+                Kelola pemasukan dan pengeluaran
+              </p>
+            </div>
+            <button
+              onClick={() => {
               setIsFormOpen(true)
               setEditingId(null)
               setFormData({
@@ -284,31 +281,24 @@ export default function TransaksiPage() {
                 notes: '',
               })
             }}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold shadow-lg transition-colors"
+            className="bg-brand-primary hover:bg-brand-primary-hover text-white px-6 py-3 rounded-lg font-semibold shadow-lg transition-colors"
           >
             + Tambah Transaksi
           </button>
+          </div>
         </div>
 
         {/* Form Modal */}
-        {isFormOpen && (
-          <div 
-            className="fixed inset-0 backdrop-blur-sm bg-white/30 dark:bg-black/30 flex items-center justify-center z-50 p-4 animate-fadeIn"
-            onClick={() => {
-              setIsFormOpen(false)
-              setEditingId(null)
-            }}
-          >
-            <div 
-              className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto animate-scaleIn"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="p-6">
-                <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
-                  {editingId ? 'Edit Transaksi' : 'Tambah Transaksi'}
-                </h2>
-                
-                <form onSubmit={handleSubmit} className="space-y-4">
+        <Modal
+          isOpen={isFormOpen}
+          onClose={() => {
+            setIsFormOpen(false)
+            setEditingId(null)
+          }}
+          title={editingId ? 'Edit Transaksi' : 'Tambah Transaksi'}
+          maxWidth="md"
+        >
+          <form onSubmit={handleSubmit} className="space-y-4">
                   {/* Date */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -334,8 +324,8 @@ export default function TransaksiPage() {
                         onClick={() => setFormData({ ...formData, type: 'income', categoryId: '' })}
                         className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                           formData.type === 'income'
-                            ? 'bg-green-600 text-white'
-                            : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                            ? 'bg-status-success text-white'
+                            : 'bg-neutral-200 dark:bg-neutral-700 text-gray-700 dark:text-gray-300'
                         }`}
                       >
                         📈 Pemasukan
@@ -345,8 +335,8 @@ export default function TransaksiPage() {
                         onClick={() => setFormData({ ...formData, type: 'expense', categoryId: '' })}
                         className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                           formData.type === 'expense'
-                            ? 'bg-red-600 text-white'
-                            : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                            ? 'bg-status-danger text-white'
+                            : 'bg-neutral-200 dark:bg-neutral-700 text-gray-700 dark:text-gray-300'
                         }`}
                       >
                         📉 Pengeluaran
@@ -376,26 +366,11 @@ export default function TransaksiPage() {
 
                   {/* Savings Location - Show only for savings categories */}
                   {isSavingsCategory && (
-                    <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        💎 Lokasi Tabungan
-                      </label>
-                      <select
-                        value={formData.savingsLocation}
-                        onChange={(e) => setFormData({ ...formData, savingsLocation: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-                      >
-                        <option value="">Pilih Lokasi (Opsional)</option>
-                        {savingsLocations.map((loc) => (
-                          <option key={loc} value={loc}>
-                            {loc}
-                          </option>
-                        ))}
-                      </select>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        Track tabungan di bank/dompet mana
-                      </p>
-                    </div>
+                    <SavingsLocationField
+                      value={formData.savingsLocation}
+                      onChange={(value) => setFormData({ ...formData, savingsLocation: value })}
+                      required={false}
+                    />
                   )}
 
                   {/* Description */}
@@ -451,22 +426,19 @@ export default function TransaksiPage() {
                         setIsFormOpen(false)
                         setEditingId(null)
                       }}
-                      className="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-300 dark:hover:bg-gray-600"
+                      className="flex-1 px-4 py-2 bg-action-cancel hover:bg-action-cancel-hover text-white rounded-lg font-medium"
                     >
                       Batal
                     </button>
                     <button
                       type="submit"
-                      className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700"
+                      className="flex-1 px-4 py-2 bg-action-save hover:bg-action-save-hover text-white rounded-lg font-medium"
                     >
                       {editingId ? 'Update' : 'Simpan'}
                     </button>
                   </div>
                 </form>
-              </div>
-            </div>
-          </div>
-        )}
+              </Modal>
 
         {/* Filters */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 mb-6">
