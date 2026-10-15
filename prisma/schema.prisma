@@ -82,8 +82,8 @@ model Reimbursement {
   officeCategoryId Int
   receiptPhoto    String?  // File path to uploaded receipt
   notes           String?
-  status          String   @default("pending") // "pending", "claimed"
-  claimedAt       DateTime?
+  status          String   @default("pending") // "pending", "paid"
+  paidDate        DateTime? // Date when marked as paid
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
@@ -107,4 +107,19 @@ model AppSettings {
   updatedAt   DateTime @updatedAt
 
   @@map("app_settings")
+}
+
+// ============================================
+// COMPANY PROFILES (For Export)
+// ============================================
+
+model CompanyProfile {
+  id          Int      @id @default(autoincrement())
+  name        String
+  logoPath    String?  // Path to uploaded logo file
+  isDefault   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("company_profiles")
 }
