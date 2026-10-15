@@ -50,3 +50,6 @@ next-env.d.ts
 # Database
 *.db
 *.db-journal
+
+# Uploads (user generated content)
+/public/uploads/
