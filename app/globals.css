@@ -3,6 +3,44 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  
+  /* Brand Colors */
+  --color-brand-primary: #3b82f6;
+  --color-brand-primary-hover: #2563eb;
+  --color-brand-secondary: #8b5cf6;
+  --color-brand-secondary-hover: #7c3aed;
+  
+  /* Action Colors */
+  --color-action-save: #10b981;
+  --color-action-save-hover: #059669;
+  --color-action-delete: #ef4444;
+  --color-action-delete-hover: #dc2626;
+  --color-action-edit: #f59e0b;
+  --color-action-edit-hover: #d97706;
+  --color-action-cancel: #6b7280;
+  --color-action-cancel-hover: #4b5563;
+  
+  /* Status Colors */
+  --color-status-success: #10b981;
+  --color-status-success-light: #d1fae5;
+  --color-status-danger: #ef4444;
+  --color-status-danger-light: #fee2e2;
+  --color-status-warning: #f59e0b;
+  --color-status-warning-light: #fef3c7;
+  --color-status-info: #06b6d4;
+  --color-status-info-light: #cffafe;
+  
+  /* Neutral Colors - Light Mode */
+  --color-neutral-50: #f9fafb;
+  --color-neutral-100: #f3f4f6;
+  --color-neutral-200: #e5e7eb;
+  --color-neutral-300: #d1d5db;
+  --color-neutral-400: #9ca3af;
+  --color-neutral-500: #6b7280;
+  --color-neutral-600: #4b5563;
+  --color-neutral-700: #374151;
+  --color-neutral-800: #1f2937;
+  --color-neutral-900: #111827;
 }
 
 @theme inline {
@@ -10,12 +48,88 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  
+  /* Brand Colors */
+  --color-brand-primary: var(--color-brand-primary);
+  --color-brand-primary-hover: var(--color-brand-primary-hover);
+  --color-brand-secondary: var(--color-brand-secondary);
+  --color-brand-secondary-hover: var(--color-brand-secondary-hover);
+  
+  /* Action Colors */
+  --color-action-save: var(--color-action-save);
+  --color-action-save-hover: var(--color-action-save-hover);
+  --color-action-delete: var(--color-action-delete);
+  --color-action-delete-hover: var(--color-action-delete-hover);
+  --color-action-edit: var(--color-action-edit);
+  --color-action-edit-hover: var(--color-action-edit-hover);
+  --color-action-cancel: var(--color-action-cancel);
+  --color-action-cancel-hover: var(--color-action-cancel-hover);
+  
+  /* Status Colors */
+  --color-status-success: var(--color-status-success);
+  --color-status-success-light: var(--color-status-success-light);
+  --color-status-danger: var(--color-status-danger);
+  --color-status-danger-light: var(--color-status-danger-light);
+  --color-status-warning: var(--color-status-warning);
+  --color-status-warning-light: var(--color-status-warning-light);
+  --color-status-info: var(--color-status-info);
+  --color-status-info-light: var(--color-status-info-light);
+  
+  /* Neutral Colors */
+  --color-neutral-50: var(--color-neutral-50);
+  --color-neutral-100: var(--color-neutral-100);
+  --color-neutral-200: var(--color-neutral-200);
+  --color-neutral-300: var(--color-neutral-300);
+  --color-neutral-400: var(--color-neutral-400);
+  --color-neutral-500: var(--color-neutral-500);
+  --color-neutral-600: var(--color-neutral-600);
+  --color-neutral-700: var(--color-neutral-700);
+  --color-neutral-800: var(--color-neutral-800);
+  --color-neutral-900: var(--color-neutral-900);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    
+    /* Dark Mode Adjustments */
+    --color-brand-primary: #60a5fa;
+    --color-brand-primary-hover: #3b82f6;
+    --color-brand-secondary: #a78bfa;
+    --color-brand-secondary-hover: #8b5cf6;
+    
+    /* Action colors stay same for consistency */
+    --color-action-save: #10b981;
+    --color-action-save-hover: #059669;
+    --color-action-delete: #ef4444;
+    --color-action-delete-hover: #dc2626;
+    --color-action-edit: #f59e0b;
+    --color-action-edit-hover: #d97706;
+    --color-action-cancel: #9ca3af;
+    --color-action-cancel-hover: #6b7280;
+    
+    /* Status colors - slightly brighter for dark mode */
+    --color-status-success: #34d399;
+    --color-status-success-light: #064e3b;
+    --color-status-danger: #f87171;
+    --color-status-danger-light: #7f1d1d;
+    --color-status-warning: #fbbf24;
+    --color-status-warning-light: #78350f;
+    --color-status-info: #22d3ee;
+    --color-status-info-light: #164e63;
+    
+    /* Neutral Colors - Dark Mode (inverted) */
+    --color-neutral-50: #111827;
+    --color-neutral-100: #1f2937;
+    --color-neutral-200: #374151;
+    --color-neutral-300: #4b5563;
+    --color-neutral-400: #6b7280;
+    --color-neutral-500: #9ca3af;
+    --color-neutral-600: #d1d5db;
+    --color-neutral-700: #e5e7eb;
+    --color-neutral-800: #f3f4f6;
+    --color-neutral-900: #f9fafb;
   }
 }
 
