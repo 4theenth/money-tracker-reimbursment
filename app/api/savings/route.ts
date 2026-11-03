@@ -1,20 +1,26 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { calculateAccountBalances } from '@/lib/accounts'
 
-// GET /api/savings - Get savings summary and details (SIMPLIFIED)
+// GET /api/savings - Get savings summary and details
 export async function GET() {
   try {
-    // Get all savings transactions (only "Tabungan")
+    const summary = await calculateAccountBalances()
+
+    // Get all transactions that involve savings categories or bank accounts
     const savingsTransactions = await prisma.transaction.findMany({
-      where: { isSaving: true },
+      where: {
+        OR: [
+          { isSaving: true },
+          { savingsLocation: { not: 'Tunai / Dompet' } },
+        ],
+      },
       include: { category: true },
       orderBy: { date: 'desc' },
     })
 
-    // Calculate summary (simple: sum expense)
-    const totalSavings = savingsTransactions.reduce((sum, t) => sum + t.expense, 0)
     const count = savingsTransactions.length
-    const average = count > 0 ? totalSavings / count : 0
+    const average = count > 0 ? summary.totalSavings / count : 0
 
     // Group by month
     const byMonth = savingsTransactions.reduce((acc, t) => {
@@ -27,18 +33,19 @@ export async function GET() {
           count: 0,
         }
       }
-      acc[key].total += t.expense
+      acc[key].total += t.expense || t.income || 0
       acc[key].count += 1
       return acc
     }, {} as Record<string, { month: string; total: number; count: number }>)
 
-    const monthlyData = Object.values(byMonth).sort((a, b) => 
+    type MonthlyItem = { month: string; total: number; count: number }
+    const monthlyData = (Object.values(byMonth) as MonthlyItem[]).sort((a, b) => 
       b.month.localeCompare(a.month)
     )
 
     return NextResponse.json({
       summary: {
-        total: totalSavings,
+        total: summary.totalSavings,
         count,
         average,
       },
