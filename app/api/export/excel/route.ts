@@ -3,6 +3,8 @@ import { PrismaClient } from '@prisma/client'
 import * as ExcelJS from 'exceljs'
 import { formatCurrency } from '@/lib/utils'
 import * as fs from 'fs'
+import * as path from 'path'
+import sharp from 'sharp'
 import { prisma } from '@/lib/prisma'
 
 export async function POST(request: NextRequest) {
@@ -113,15 +115,25 @@ export async function POST(request: NextRequest) {
 
     let currentRow = 1
 
-    // Add logo if provided (base64)
+    // Add logo if provided
     if (companyLogo) {
       try {
-        // Extract base64 data
-        const base64Data = companyLogo.replace(/^data:image\/\w+;base64,/, '')
-        const imageBuffer = Buffer.from(base64Data, 'base64')
+        let imageBuffer: Buffer
+        if (companyLogo.startsWith('data:image')) {
+          const base64Data = companyLogo.replace(/^data:image\/\w+;base64,/, '')
+          imageBuffer = Buffer.from(base64Data, 'base64')
+        } else {
+          const imagePath = path.join(process.cwd(), 'public', companyLogo)
+          if (fs.existsSync(imagePath)) {
+            imageBuffer = fs.readFileSync(imagePath)
+          } else {
+            throw new Error('Logo file not found')
+          }
+        }
         
+        const validLogoBuffer = await sharp(imageBuffer).png().toBuffer()
         const imageId = workbook.addImage({
-          buffer: imageBuffer,
+          buffer: validLogoBuffer as any,
           extension: 'png',
         })
 
@@ -246,10 +258,13 @@ export async function POST(request: NextRequest) {
           const imagePath = path.join(process.cwd(), 'public', reimb.receiptPhoto)
           
           if (fs.existsSync(imagePath)) {
-            const imageBuffer = fs.readFileSync(imagePath)
+            const imgBuffer = await sharp(imagePath)
+              .jpeg({ quality: 85 })
+              .toBuffer()
+
             const imageId = workbook.addImage({
-              buffer: imageBuffer,
-              extension: 'webp',
+              buffer: imgBuffer as any,
+              extension: 'jpeg',
             })
 
             worksheet.addImage(imageId, {

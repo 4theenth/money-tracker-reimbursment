@@ -4,6 +4,7 @@ import PDFDocument from 'pdfkit'
 import { formatCurrency } from '@/lib/utils'
 import * as fs from 'fs'
 import * as path from 'path'
+import sharp from 'sharp'
 import { prisma } from '@/lib/prisma'
 
 export async function POST(request: NextRequest) {
@@ -22,6 +23,7 @@ export async function POST(request: NextRequest) {
     let startDate: Date
     let endDate: Date
     let periodLabel: string
+    let filePeriodSuffix: string
 
     // NEW: Support date range
     if (reqStartDate && reqEndDate) {
@@ -50,6 +52,7 @@ export async function POST(request: NextRequest) {
         // Different years: "1 Oktober 2026 - 15 Januari 2027"
         periodLabel = `${startDay} ${startMonth} ${startYear} - ${endDay} ${endMonth} ${endYear}`
       }
+      filePeriodSuffix = `${reqStartDate}_to_${reqEndDate}`
     }
     // LEGACY: Support old selectedMonth format (backward compatibility)
     else if (selectedMonth) {
@@ -59,6 +62,7 @@ export async function POST(request: NextRequest) {
 
       const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember']
       periodLabel = `${months[month - 1]} ${year}`
+      filePeriodSuffix = `${selectedMonth}`
     }
     else {
       return NextResponse.json(
@@ -144,7 +148,9 @@ export async function POST(request: NextRequest) {
           }
         }
         
-        doc.image(imageBuffer, 50, 50, { width: 80, height: 50 })
+        // Convert to PNG buffer for PDFKit compatibility
+        const validLogoBuffer = await sharp(imageBuffer).png().toBuffer()
+        doc.image(validLogoBuffer, 50, 50, { width: 80, height: 50, fit: [80, 50] })
         console.log('Logo added successfully')
       } catch (error) {
         console.error('Failed to add logo:', error)
@@ -267,7 +273,12 @@ export async function POST(request: NextRequest) {
           const imagePath = path.join(process.cwd(), 'public', reimb.receiptPhoto)
           
           if (fs.existsSync(imagePath)) {
-            doc.image(imagePath, 350, yPosition + 10, { 
+            // Convert to JPEG buffer using sharp for PDFKit compatibility (handles WebP, PNG, JPG)
+            const imgBuffer = await sharp(imagePath)
+              .jpeg({ quality: 85 })
+              .toBuffer()
+
+            doc.image(imgBuffer, 350, yPosition + 10, { 
               width: 180,
               height: 120,
               fit: [180, 120]
@@ -340,10 +351,11 @@ export async function POST(request: NextRequest) {
     const pdfBuffer = await pdfPromise
 
     // Return as downloadable file
-    return new NextResponse(pdfBuffer, {
+    const filename = `Reimbursement_${filePeriodSuffix}.pdf`
+    return new NextResponse(new Uint8Array(pdfBuffer), {
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="Reimbursement_${monthNames[month - 1]}_${year}.pdf"`
+        'Content-Disposition': `attachment; filename="${filename}"`
       }
     })
 

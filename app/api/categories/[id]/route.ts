@@ -4,9 +4,10 @@ import { prisma } from '@/lib/prisma'
 // PUT /api/categories/[id] - Update category
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const params = await context.params
     const id = parseInt(params.id)
     const body = await request.json()
     const { name, type, icon, color, isActive } = body
@@ -78,9 +79,10 @@ export async function PUT(
 // DELETE /api/categories/[id] - Soft delete (set inactive)
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const params = await context.params
     const id = parseInt(params.id)
 
     // Check if category exists
