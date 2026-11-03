@@ -52,7 +52,10 @@ export default async function Home() {
 
         {/* Main Summary Cards - Cash & Wealth */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-          <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-lg shadow-lg p-6 text-white">
+          <Link
+            href="/transaksi"
+            className="bg-gradient-to-br from-green-500 to-green-600 rounded-lg shadow-lg p-6 text-white group cursor-pointer hover:shadow-xl hover:-translate-y-1 transition-all duration-200 block"
+          >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-green-100 text-sm mb-1">Cash On Hand</p>
@@ -63,11 +66,18 @@ export default async function Home() {
                 </p>
                 <p className="text-green-100 text-xs mt-2">Uang di tangan/dompet</p>
               </div>
-              <div className="text-5xl opacity-80">💵</div>
+              <div className="text-5xl opacity-80 group-hover:scale-110 transition-transform">💵</div>
             </div>
-          </div>
+            <div className="mt-4 pt-2 border-t border-white/20 flex items-center justify-between text-xs text-green-100 font-medium">
+              <span>Buka Catatan Transaksi</span>
+              <span className="group-hover:translate-x-1 transition-transform font-bold">→</span>
+            </div>
+          </Link>
 
-          <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg shadow-lg p-6 text-white">
+          <Link
+            href="/tabungan"
+            className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg shadow-lg p-6 text-white group cursor-pointer hover:shadow-xl hover:-translate-y-1 transition-all duration-200 block"
+          >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-purple-100 text-sm mb-1">Total Tabungan</p>
@@ -77,12 +87,30 @@ export default async function Home() {
                   {formatCurrency(cashData.totalSavings)}
                 </p>
                 <p className="text-purple-100 text-xs mt-2">Di bank & dompet digital</p>
+                {cashData.locationBalances && (
+                  <div className="mt-2 text-xs text-purple-100/90 flex flex-wrap gap-1.5">
+                    {Object.entries(cashData.locationBalances)
+                      .filter(([name]) => name !== 'Tunai / Dompet')
+                      .map(([name, data]: [string, any]) => (
+                        <span key={name} className="bg-purple-700/50 px-2 py-0.5 rounded text-[11px] font-medium">
+                          {name}: {formatCurrency(data.balance)}
+                        </span>
+                      ))}
+                  </div>
+                )}
               </div>
-              <div className="text-5xl opacity-80">🏦</div>
+              <div className="text-5xl opacity-80 group-hover:scale-110 transition-transform">🏦</div>
             </div>
-          </div>
+            <div className="mt-4 pt-2 border-t border-white/20 flex items-center justify-between text-xs text-purple-100 font-medium">
+              <span>Kelola Saldo Rekening</span>
+              <span className="group-hover:translate-x-1 transition-transform font-bold">→</span>
+            </div>
+          </Link>
 
-          <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-lg p-6 text-white">
+          <Link
+            href="/tabungan/buku"
+            className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-lg p-6 text-white group cursor-pointer hover:shadow-xl hover:-translate-y-1 transition-all duration-200 block"
+          >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-blue-100 text-sm mb-1">Total Kekayaan</p>
@@ -93,67 +121,144 @@ export default async function Home() {
                 </p>
                 <p className="text-blue-100 text-xs mt-2">Cash + Tabungan</p>
               </div>
-              <div className="text-5xl opacity-80">💎</div>
+              <div className="text-5xl opacity-80 group-hover:scale-110 transition-transform">💎</div>
             </div>
-          </div>
+            <div className="mt-4 pt-2 border-t border-white/20 flex items-center justify-between text-xs text-blue-100 font-medium">
+              <span>Lihat Buku Tabungan & Mutasi</span>
+              <span className="group-hover:translate-x-1 transition-transform font-bold">→</span>
+            </div>
+          </Link>
         </div>
 
         {/* Summary Cards - Income & Expense */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+          <Link
+            href="/transaksi"
+            className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 border border-transparent hover:border-green-500/40 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 group cursor-pointer block"
+          >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-500 dark:text-gray-400 text-sm mb-1">Total Pemasukan</p>
                 <p className="text-2xl font-bold text-green-600">
                   {formatCurrency(totalIncome._sum.income || 0)}
                 </p>
+                <p className="text-xs text-green-600/80 dark:text-green-400/80 mt-1 font-medium group-hover:underline flex items-center gap-1">
+                  <span>Lihat Riwayat Transaksi</span>
+                  <span className="group-hover:translate-x-1 transition-transform">→</span>
+                </p>
               </div>
-              <div className="text-4xl">📈</div>
+              <div className="text-4xl group-hover:scale-110 transition-transform">📈</div>
             </div>
-          </div>
+          </Link>
 
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+          <Link
+            href="/transaksi"
+            className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 border border-transparent hover:border-red-500/40 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 group cursor-pointer block"
+          >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-500 dark:text-gray-400 text-sm mb-1">Total Pengeluaran</p>
                 <p className="text-2xl font-bold text-red-600">
                   {formatCurrency(totalExpense._sum.expense || 0)}
                 </p>
+                <p className="text-xs text-red-600/80 dark:text-red-400/80 mt-1 font-medium group-hover:underline flex items-center gap-1">
+                  <span>Lihat Riwayat Transaksi</span>
+                  <span className="group-hover:translate-x-1 transition-transform">→</span>
+                </p>
               </div>
-              <div className="text-4xl">📉</div>
+              <div className="text-4xl group-hover:scale-110 transition-transform">📉</div>
             </div>
-          </div>
+          </Link>
         </div>
 
-        {/* Quick Actions */}
+        {/* Quick Actions (Action Hub) */}
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-lg font-bold text-gray-800 dark:text-white">
+            Menu Utama
+          </h2>
+          <span className="text-xs text-gray-500 dark:text-gray-400">
+            Akses cepat fitur aplikasi
+          </span>
+        </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <Link
             href="/transaksi"
-            className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 hover:shadow-lg transition-shadow cursor-pointer"
+            className="group relative bg-white dark:bg-gray-800 rounded-xl p-5 border-2 border-emerald-500/20 hover:border-emerald-500 shadow hover:shadow-xl hover:-translate-y-1 active:scale-[0.98] transition-all duration-200 cursor-pointer block"
           >
-            <div className="text-3xl mb-2">💰</div>
-            <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">Transaksi</p>
+            <div className="flex items-start justify-between mb-3">
+              <div className="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 flex items-center justify-center text-2xl shadow-sm group-hover:scale-110 transition-transform">
+                💰
+              </div>
+              <span className="text-emerald-500 group-hover:translate-x-1 transition-transform text-base font-bold">
+                →
+              </span>
+            </div>
+            <h3 className="text-base font-bold text-gray-800 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+              Transaksi
+            </h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              Catat pemasukan, belanja & kas
+            </p>
           </Link>
+
           <Link
             href="/kategori"
-            className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 hover:shadow-lg transition-shadow cursor-pointer"
+            className="group relative bg-white dark:bg-gray-800 rounded-xl p-5 border-2 border-indigo-500/20 hover:border-indigo-500 shadow hover:shadow-xl hover:-translate-y-1 active:scale-[0.98] transition-all duration-200 cursor-pointer block"
           >
-            <div className="text-3xl mb-2">🏷️</div>
-            <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">Kategori</p>
+            <div className="flex items-start justify-between mb-3">
+              <div className="w-12 h-12 rounded-xl bg-indigo-100 dark:bg-indigo-950/60 flex items-center justify-center text-2xl shadow-sm group-hover:scale-110 transition-transform">
+                🏷️
+              </div>
+              <span className="text-indigo-500 group-hover:translate-x-1 transition-transform text-base font-bold">
+                →
+              </span>
+            </div>
+            <h3 className="text-base font-bold text-gray-800 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+              Kategori
+            </h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              Kelola pos belanja & icon emoji
+            </p>
           </Link>
+
           <Link
             href="/tabungan"
-            className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 hover:shadow-lg transition-shadow cursor-pointer"
+            className="group relative bg-white dark:bg-gray-800 rounded-xl p-5 border-2 border-blue-500/20 hover:border-blue-500 shadow hover:shadow-xl hover:-translate-y-1 active:scale-[0.98] transition-all duration-200 cursor-pointer block"
           >
-            <div className="text-3xl mb-2">💎</div>
-            <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">Tabungan</p>
+            <div className="flex items-start justify-between mb-3">
+              <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-950/60 flex items-center justify-center text-2xl shadow-sm group-hover:scale-110 transition-transform">
+                💎
+              </div>
+              <span className="text-blue-500 group-hover:translate-x-1 transition-transform text-base font-bold">
+                →
+              </span>
+            </div>
+            <h3 className="text-base font-bold text-gray-800 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+              Tabungan
+            </h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              Saldo rekening bank & passbook
+            </p>
           </Link>
+
           <Link
             href="/reimbursement"
-            className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 hover:shadow-lg transition-shadow cursor-pointer"
+            className="group relative bg-white dark:bg-gray-800 rounded-xl p-5 border-2 border-purple-500/20 hover:border-purple-500 shadow hover:shadow-xl hover:-translate-y-1 active:scale-[0.98] transition-all duration-200 cursor-pointer block"
           >
-            <div className="text-3xl mb-2">🏢</div>
-            <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">Reimbursement</p>
+            <div className="flex items-start justify-between mb-3">
+              <div className="w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-950/60 flex items-center justify-center text-2xl shadow-sm group-hover:scale-110 transition-transform">
+                🏢
+              </div>
+              <span className="text-purple-500 group-hover:translate-x-1 transition-transform text-base font-bold">
+                →
+              </span>
+            </div>
+            <h3 className="text-base font-bold text-gray-800 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+              Reimbursement
+            </h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              Klaim biaya & export laporan
+            </p>
           </Link>
         </div>
 
