@@ -2,14 +2,15 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
 type Params = {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 // GET /api/reimbursements/[id] - Get single reimbursement
-export async function GET(request: NextRequest, { params }: Params) {
+export async function GET(request: NextRequest, context: Params) {
   try {
+    const params = await context.params
     const id = parseInt(params.id)
 
     const reimbursement = await prisma.reimbursement.findUnique({
@@ -42,8 +43,9 @@ export async function GET(request: NextRequest, { params }: Params) {
 }
 
 // PUT /api/reimbursements/[id] - Update reimbursement
-export async function PUT(request: NextRequest, { params }: Params) {
+export async function PUT(request: NextRequest, context: Params) {
   try {
+    const params = await context.params
     const id = parseInt(params.id)
     const body = await request.json()
     const { officeCategoryId, receiptPhoto, notes, status } = body
@@ -84,8 +86,9 @@ export async function PUT(request: NextRequest, { params }: Params) {
 }
 
 // DELETE /api/reimbursements/[id] - Delete reimbursement
-export async function DELETE(request: NextRequest, { params }: Params) {
+export async function DELETE(request: NextRequest, context: Params) {
   try {
+    const params = await context.params
     const id = parseInt(params.id)
 
     await prisma.reimbursement.delete({

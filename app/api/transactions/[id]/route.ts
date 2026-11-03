@@ -1,12 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
+interface RouteContext {
+  params: Promise<{ id: string }> | { id: string }
+}
+
 // GET /api/transactions/[id] - Get single transaction
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: RouteContext
 ) {
   try {
+    const params = await Promise.resolve(context.params)
     const transaction = await prisma.transaction.findUnique({
       where: { id: parseInt(params.id) },
       include: { category: true },
@@ -32,11 +37,12 @@ export async function GET(
 // PUT /api/transactions/[id] - Update transaction
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: RouteContext
 ) {
   try {
+    const params = await Promise.resolve(context.params)
     const body = await request.json()
-    const { date, categoryId, description, income, expense, isSaving } = body
+    const { date, categoryId, description, income, expense, isSaving, savingsLocation } = body
 
     const transaction = await prisma.transaction.update({
       where: { id: parseInt(params.id) },
@@ -47,6 +53,7 @@ export async function PUT(
         income: income !== undefined ? income : undefined,
         expense: expense !== undefined ? expense : undefined,
         isSaving,
+        savingsLocation: savingsLocation !== undefined ? savingsLocation : undefined,
       },
       include: { category: true },
     })
@@ -67,9 +74,10 @@ export async function PUT(
 // DELETE /api/transactions/[id] - Delete transaction
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: RouteContext
 ) {
   try {
+    const params = await Promise.resolve(context.params)
     await prisma.transaction.delete({
       where: { id: parseInt(params.id) },
     })

@@ -116,6 +116,11 @@ export async function POST(request: NextRequest) {
     const previousBalance = lastTransaction?.balance || 0
     const newBalance = previousBalance + (income || 0) - (expense || 0)
 
+    // Resolve payment source / savings location (defaults to 'Tunai / Dompet')
+    const resolvedLocation = savingsLocation && typeof savingsLocation === 'string' && savingsLocation.trim()
+      ? savingsLocation.trim()
+      : 'Tunai / Dompet'
+
     // Create transaction
     const transaction = await prisma.transaction.create({
       data: {
@@ -126,7 +131,7 @@ export async function POST(request: NextRequest) {
         expense: expense || 0,
         balance: newBalance,
         isSaving: isTabungan,
-        savingsLocation: isTabungan ? savingsLocation : null,
+        savingsLocation: resolvedLocation,
       },
       include: {
         category: true,

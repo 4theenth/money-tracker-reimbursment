@@ -42,7 +42,7 @@ export default function TransaksiPage() {
     description: '',
     type: 'expense',
     amount: '',
-    savingsLocation: '',
+    savingsLocation: 'Tunai / Dompet',
     // Reimbursement fields
     officeCategoryId: '',
     receiptPhoto: '',
@@ -203,7 +203,10 @@ export default function TransaksiPage() {
       description: transaction.description,
       type: transaction.income > 0 ? 'income' : 'expense',
       amount: (transaction.income > 0 ? transaction.income : transaction.expense).toString(),
-      savingsLocation: transaction.savingsLocation || '',
+      savingsLocation: transaction.savingsLocation || 'Tunai / Dompet',
+      officeCategoryId: '',
+      receiptPhoto: '',
+      notes: '',
     })
     setIsFormOpen(true)
   }
@@ -275,7 +278,7 @@ export default function TransaksiPage() {
                 description: '',
                 type: 'expense',
                 amount: '',
-                savingsLocation: '',
+                savingsLocation: 'Tunai / Dompet',
                 officeCategoryId: '',
                 receiptPhoto: '',
                 notes: '',
@@ -299,10 +302,14 @@ export default function TransaksiPage() {
           maxWidth="md"
         >
           <form onSubmit={handleSubmit} className="space-y-4">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 -mt-2 mb-3">
+                    Kolom dengan tanda <span className="text-status-danger font-bold">*</span> wajib diisi
+                  </p>
+
                   {/* Date */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Tanggal
+                      Tanggal <span className="text-status-danger font-bold">*</span>
                     </label>
                     <input
                       type="date"
@@ -316,7 +323,7 @@ export default function TransaksiPage() {
                   {/* Type */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Tipe
+                      Tipe <span className="text-status-danger font-bold">*</span>
                     </label>
                     <div className="grid grid-cols-2 gap-2">
                       <button
@@ -324,8 +331,8 @@ export default function TransaksiPage() {
                         onClick={() => setFormData({ ...formData, type: 'income', categoryId: '' })}
                         className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                           formData.type === 'income'
-                            ? 'bg-status-success text-white'
-                            : 'bg-neutral-200 dark:bg-neutral-700 text-gray-700 dark:text-gray-300'
+                            ? 'bg-green-600 text-white'
+                            : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
                         }`}
                       >
                         📈 Pemasukan
@@ -335,8 +342,8 @@ export default function TransaksiPage() {
                         onClick={() => setFormData({ ...formData, type: 'expense', categoryId: '' })}
                         className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                           formData.type === 'expense'
-                            ? 'bg-status-danger text-white'
-                            : 'bg-neutral-200 dark:bg-neutral-700 text-gray-700 dark:text-gray-300'
+                            ? 'bg-red-600 text-white'
+                            : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
                         }`}
                       >
                         📉 Pengeluaran
@@ -347,7 +354,7 @@ export default function TransaksiPage() {
                   {/* Category */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Kategori
+                      Kategori <span className="text-status-danger font-bold">*</span>
                     </label>
                     <select
                       value={formData.categoryId}
@@ -364,19 +371,19 @@ export default function TransaksiPage() {
                     </select>
                   </div>
 
-                  {/* Savings Location - Show only for savings categories */}
-                  {isSavingsCategory && (
-                    <SavingsLocationField
-                      value={formData.savingsLocation}
-                      onChange={(value) => setFormData({ ...formData, savingsLocation: value })}
-                      required={false}
-                    />
-                  )}
+                  {/* Savings Location / Payment Source */}
+                  <SavingsLocationField
+                    value={formData.savingsLocation || 'Tunai / Dompet'}
+                    onChange={(value) => setFormData({ ...formData, savingsLocation: value })}
+                    type={formData.type}
+                    isSaving={isSavingsCategory}
+                    required={false}
+                  />
 
                   {/* Description */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Keterangan
+                      Keterangan <span className="text-status-danger font-bold">*</span>
                     </label>
                     <textarea
                       value={formData.description}
@@ -391,7 +398,7 @@ export default function TransaksiPage() {
                   {/* Amount */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Jumlah (Rp)
+                      Jumlah (Rp) <span className="text-status-danger font-bold">*</span>
                     </label>
                     <input
                       type="number"
@@ -426,13 +433,13 @@ export default function TransaksiPage() {
                         setIsFormOpen(false)
                         setEditingId(null)
                       }}
-                      className="flex-1 px-4 py-2 bg-action-cancel hover:bg-action-cancel-hover text-white rounded-lg font-medium"
+                      className="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
                     >
                       Batal
                     </button>
                     <button
                       type="submit"
-                      className="flex-1 px-4 py-2 bg-action-save hover:bg-action-save-hover text-white rounded-lg font-medium"
+                      className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50"
                     >
                       {editingId ? 'Update' : 'Simpan'}
                     </button>
@@ -549,7 +556,15 @@ export default function TransaksiPage() {
                         </span>
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
-                        {transaction.description}
+                        <div className="font-medium text-gray-800 dark:text-gray-200">
+                          {transaction.description}
+                        </div>
+                        {transaction.savingsLocation && (
+                          <div className="inline-flex items-center gap-1 mt-1 text-xs text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded-full font-normal">
+                            <span>{transaction.savingsLocation.toLowerCase().includes('tunai') ? '💵' : '🏦'}</span>
+                            <span>{transaction.savingsLocation}</span>
+                          </div>
+                        )}
                       </td>
                       <td className="px-4 py-3 text-sm text-right">
                         {transaction.income > 0 ? (

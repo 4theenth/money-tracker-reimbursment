@@ -406,10 +406,14 @@ export default function KategoriPage() {
                 </h2>
                 
                 <form onSubmit={handleSubmit} className="space-y-4">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 -mt-2 mb-3">
+                    Kolom dengan tanda <span className="text-status-danger font-bold">*</span> wajib diisi
+                  </p>
+
                   {/* Name */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Nama Kategori *
+                      Nama Kategori <span className="text-status-danger font-bold">*</span>
                     </label>
                     <input
                       type="text"
@@ -424,7 +428,7 @@ export default function KategoriPage() {
                   {/* Type */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Tipe *
+                      Tipe <span className="text-status-danger font-bold">*</span>
                     </label>
                     <div className="grid grid-cols-2 gap-2">
                       <button
@@ -455,7 +459,7 @@ export default function KategoriPage() {
                   {/* Icon */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Icon
+                      Icon <span className="text-xs text-gray-500 dark:text-gray-400 font-normal">(Opsional)</span>
                     </label>
                     <div className="grid grid-cols-8 gap-2 max-h-40 overflow-y-auto p-2 border border-gray-300 dark:border-gray-600 rounded-lg">
                       {emojiOptions.map((emoji) => (
@@ -476,7 +480,7 @@ export default function KategoriPage() {
                   {/* Color */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Warna
+                      Warna <span className="text-xs text-gray-500 dark:text-gray-400 font-normal">(Opsional)</span>
                     </label>
                     <div className="grid grid-cols-4 gap-2">
                       {colorOptions.map((color) => (
@@ -793,10 +797,14 @@ export default function KategoriPage() {
                 </h2>
                 
                 <form onSubmit={handleReimbSubmit} className="space-y-4">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 -mt-2 mb-3">
+                    Kolom dengan tanda <span className="text-status-danger font-bold">*</span> wajib diisi
+                  </p>
+
                   {/* Name */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Nama Kategori *
+                      Nama Kategori <span className="text-status-danger font-bold">*</span>
                     </label>
                     <input
                       type="text"
@@ -811,7 +819,7 @@ export default function KategoriPage() {
                   {/* Icon Picker */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Icon
+                      Icon <span className="text-xs text-gray-500 dark:text-gray-400 font-normal">(Opsional)</span>
                     </label>
                     <div className="grid grid-cols-8 gap-2 max-h-48 overflow-y-auto p-2 border border-gray-300 dark:border-gray-600 rounded-lg">
                       {emojiOptions.map((emoji) => (

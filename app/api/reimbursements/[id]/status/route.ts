@@ -4,9 +4,10 @@ import { prisma } from '@/lib/prisma'
 // PATCH /api/reimbursements/:id/status - Update status reimbursement
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const params = await context.params
     const id = parseInt(params.id)
     const body = await request.json()
     const { status } = body

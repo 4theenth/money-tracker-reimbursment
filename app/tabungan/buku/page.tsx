@@ -2,15 +2,16 @@
 
 import { useState, useEffect } from 'react'
 import { formatCurrency, formatDate } from '@/lib/utils'
+import { useNotification } from '@/contexts/NotificationContext'
 import Link from 'next/link'
 
 interface Transaction {
   id: number
   date: string
   description: string
-  expense: number
-  income: number
-  savingsLocation: string | null
+  debit: number
+  credit: number
+  savingsLocation: string
   category: {
     name: string
     icon: string | null
@@ -18,31 +19,61 @@ interface Transaction {
   runningBalance: number
 }
 
+interface PassbookData {
+  location: string
+  locationTitle?: string
+  period: {
+    month: number
+    year: number
+  }
+  startBalance: number
+  endBalance: number
+  totalDebit: number
+  totalCredit: number
+  transactions: Transaction[]
+}
+
 export default function BukuTabunganPage() {
-  const [transactions, setTransactions] = useState<Transaction[]>([])
+  const { showSuccess, showError } = useNotification()
+  const [passbook, setPassbook] = useState<PassbookData | null>(null)
+  const [locations, setLocations] = useState<string[]>([])
+  const [selectedLocation, setSelectedLocation] = useState('all')
   const [loading, setLoading] = useState(true)
   const [selectedMonth, setSelectedMonth] = useState('')
   const [selectedYear, setSelectedYear] = useState('')
+  const [exportingExcel, setExportingExcel] = useState(false)
+  const [exportingPdf, setExportingPdf] = useState(false)
 
   useEffect(() => {
-    // Set default to current month/year
     const now = new Date()
     setSelectedMonth((now.getMonth() + 1).toString())
     setSelectedYear(now.getFullYear().toString())
+    fetchLocations()
   }, [])
 
   useEffect(() => {
     if (selectedMonth && selectedYear) {
-      fetchTransactions()
+      fetchPassbook()
     }
-  }, [selectedMonth, selectedYear])
+  }, [selectedMonth, selectedYear, selectedLocation])
 
-  const fetchTransactions = async () => {
+  const fetchLocations = async () => {
+    try {
+      const res = await fetch('/api/settings/savings-locations')
+      const data = await res.json()
+      setLocations(data.locations || ['Tunai / Dompet', 'Bank BCA', 'Bank BRI'])
+    } catch (error) {
+      console.error('Error fetching locations:', error)
+    }
+  }
+
+  const fetchPassbook = async () => {
     try {
       setLoading(true)
-      const res = await fetch(`/api/savings/passbook?month=${selectedMonth}&year=${selectedYear}`)
+      const locParam = selectedLocation ? `&location=${encodeURIComponent(selectedLocation)}` : ''
+      const res = await fetch(`/api/savings/passbook?month=${selectedMonth}&year=${selectedYear}${locParam}`)
       const data = await res.json()
-      setTransactions(data.transactions || [])
+      setPassbook(data)
     } catch (error) {
       console.error('Error fetching passbook:', error)
     } finally {
@@ -54,9 +85,67 @@ export default function BukuTabunganPage() {
     window.print()
   }
 
-  const currentBalance = transactions.length > 0 
-    ? transactions[transactions.length - 1].runningBalance 
-    : 0
+  const handleExportExcel = async () => {
+    try {
+      setExportingExcel(true)
+      showSuccess('Menyiapkan file Excel...')
+      const locParam = selectedLocation ? `&location=${encodeURIComponent(selectedLocation)}` : ''
+      const res = await fetch(`/api/savings/passbook/excel?month=${selectedMonth}&year=${selectedYear}${locParam}`)
+      
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.error || 'Gagal mengekspor data Excel')
+      }
+
+      const blob = await res.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      const safeLoc = (selectedLocation === 'all' ? 'Semua_Rekening' : selectedLocation).replace(/[^a-zA-Z0-9]/g, '_')
+      a.download = `Buku_Tabungan_${safeLoc}_${selectedMonth}_${selectedYear}.xlsx`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+      showSuccess('File Excel berhasil diunduh!')
+    } catch (error: any) {
+      console.error('Export Excel error:', error)
+      showError(error.message || 'Gagal export Excel')
+    } finally {
+      setExportingExcel(false)
+    }
+  }
+
+  const handleExportPdf = async () => {
+    try {
+      setExportingPdf(true)
+      showSuccess('Menyiapkan dokumen PDF...')
+      const locParam = selectedLocation ? `&location=${encodeURIComponent(selectedLocation)}` : ''
+      const res = await fetch(`/api/savings/passbook/pdf?month=${selectedMonth}&year=${selectedYear}${locParam}`)
+      
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.error || 'Gagal mengekspor data PDF')
+      }
+
+      const blob = await res.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      const safeLoc = (selectedLocation === 'all' ? 'Semua_Rekening' : selectedLocation).replace(/[^a-zA-Z0-9]/g, '_')
+      a.download = `Buku_Tabungan_${safeLoc}_${selectedMonth}_${selectedYear}.pdf`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+      showSuccess('File PDF berhasil diunduh!')
+    } catch (error: any) {
+      console.error('Export PDF error:', error)
+      showError(error.message || 'Gagal export PDF')
+    } finally {
+      setExportingPdf(false)
+    }
+  }
 
   const months = [
     { value: '1', label: 'Januari' },
@@ -75,6 +164,12 @@ export default function BukuTabunganPage() {
 
   const years = ['2024', '2025', '2026', '2027', '2028']
 
+  const getAccountTitle = () => {
+    return passbook?.locationTitle?.toUpperCase() || 'SEMUA AKUN (KAS TUNAI & BANK)'
+  }
+
+  const transactions = passbook?.transactions || []
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
@@ -83,84 +178,170 @@ export default function BukuTabunganPage() {
           <div>
             <Link 
               href="/tabungan"
-              className="text-blue-600 hover:text-blue-700 text-sm mb-2 inline-block print:hidden"
+              className="text-blue-600 hover:text-blue-700 dark:text-blue-400 text-sm mb-2 inline-flex items-center gap-1 font-medium print:hidden"
             >
-              ← Kembali ke Dashboard
+              ← Kembali ke Dashboard Tabungan
             </Link>
             <h1 className="text-3xl font-bold text-gray-800 dark:text-white print:text-2xl">
-              📖 Buku Tabungan
+              📖 Buku Tabungan & Mutasi Rekening
             </h1>
             <p className="text-gray-600 dark:text-gray-300 mt-1 print:text-sm">
-              Riwayat transaksi tabungan lengkap
+              Rekap aliran dana debit, kredit, dan saldo berjalan
             </p>
           </div>
         </div>
 
         {/* Filters */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 mb-6 print:hidden">
-          <div className="flex flex-wrap items-center gap-4">
-            <div className="flex items-center gap-2">
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Periode:
-              </label>
-              <select
-                value={selectedMonth}
-                onChange={(e) => setSelectedMonth(e.target.value)}
-                className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
-              >
-                {months.map(m => (
-                  <option key={m.value} value={m.value}>{m.label}</option>
-                ))}
-              </select>
-              <select
-                value={selectedYear}
-                onChange={(e) => setSelectedYear(e.target.value)}
-                className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
-              >
-                {years.map(y => (
-                  <option key={y} value={y}>{y}</option>
-                ))}
-              </select>
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex flex-wrap items-center gap-4">
+              {/* Account Filter */}
+              <div className="flex items-center gap-2">
+                <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                  Rekening:
+                </label>
+                <select
+                  value={selectedLocation}
+                  onChange={(e) => setSelectedLocation(e.target.value)}
+                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white text-sm font-medium focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="all">🌐 Semua Akun (Kas Tunai & Bank)</option>
+                  <option value="savings">🏦 Semua Rekening Bank Saja</option>
+                  {locations.map((loc) => (
+                    <option key={loc} value={loc}>
+                      {loc.toLowerCase().includes('tunai') ? '💵' : '🏦'} {loc}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Period Filter */}
+              <div className="flex items-center gap-2">
+                <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                  Periode:
+                </label>
+                <select
+                  value={selectedMonth}
+                  onChange={(e) => setSelectedMonth(e.target.value)}
+                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white text-sm"
+                >
+                  {months.map(m => (
+                    <option key={m.value} value={m.value}>{m.label}</option>
+                  ))}
+                </select>
+                <select
+                  value={selectedYear}
+                  onChange={(e) => setSelectedYear(e.target.value)}
+                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white text-sm"
+                >
+                  {years.map(y => (
+                    <option key={y} value={y}>{y}</option>
+                  ))}
+                </select>
+              </div>
             </div>
 
-            <button
-              onClick={handlePrint}
-              className="ml-auto px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2"
-            >
-              🖨️ Print / Export PDF
-            </button>
+            {/* Action Buttons */}
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={handleExportExcel}
+                disabled={exportingExcel || loading}
+                className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-400 text-white rounded-lg font-medium transition-colors flex items-center gap-1.5 text-sm shadow cursor-pointer"
+                title="Download mutasi buku tabungan format Excel (.xlsx)"
+              >
+                <span>📊</span>
+                <span>{exportingExcel ? 'Exporting...' : 'Export Excel'}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleExportPdf}
+                disabled={exportingPdf || loading}
+                className="px-3.5 py-2 bg-rose-600 hover:bg-rose-700 disabled:bg-gray-400 text-white rounded-lg font-medium transition-colors flex items-center gap-1.5 text-sm shadow cursor-pointer"
+                title="Download mutasi buku tabungan format PDF (.pdf)"
+              >
+                <span>📄</span>
+                <span>{exportingPdf ? 'Exporting...' : 'Download PDF'}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handlePrint}
+                className="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors flex items-center gap-1.5 text-sm shadow cursor-pointer"
+                title="Buka dialog cetak browser"
+              >
+                <span>🖨️</span>
+                <span>Cetak</span>
+              </button>
+            </div>
           </div>
         </div>
 
         {/* Passbook Table */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden print:shadow-none">
-          {/* Header */}
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6 text-center print:bg-gray-800">
-            <div className="text-2xl font-bold mb-2 print:text-xl">
-              ═══════════════════════════════════════
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden print:shadow-none border border-gray-200 dark:border-gray-700">
+          {/* Header Passbook */}
+          <div className="bg-gradient-to-r from-blue-700 to-indigo-700 text-white p-6 text-center print:bg-gray-800">
+            <div className="text-2xl font-mono tracking-widest opacity-60 mb-1">
+              =============================================
             </div>
-            <h2 className="text-xl font-bold print:text-lg">
-              BUKU TABUNGAN - RIWAYAT LENGKAP
+            <h2 className="text-xl font-bold tracking-wide print:text-lg">
+              BUKU TABUNGAN & REKENING KORAN
             </h2>
-            <p className="text-sm text-blue-100 mt-1">
+            <div className="inline-block mt-2 px-3 py-1 bg-white/20 rounded-full text-xs font-semibold tracking-wider">
+              {getAccountTitle()}
+            </div>
+            <p className="text-xs text-blue-100 mt-2">
               Periode: {months.find(m => m.value === selectedMonth)?.label} {selectedYear}
             </p>
-            <div className="text-2xl font-bold mt-2 print:text-xl">
-              ═══════════════════════════════════════
+            <div className="text-2xl font-mono tracking-widest opacity-60 mt-1">
+              =============================================
             </div>
           </div>
+
+          {/* Quick Balance Cards on Top of Table */}
+          {passbook && (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 p-4 bg-gray-50 dark:bg-gray-750 border-b border-gray-200 dark:border-gray-700 text-xs">
+              <div className="p-3 bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700">
+                <span className="text-gray-500 dark:text-gray-400 block">Saldo Awal:</span>
+                <span className="font-bold text-gray-800 dark:text-gray-200 text-sm">
+                  {formatCurrency(passbook.startBalance)}
+                </span>
+              </div>
+              <div className="p-3 bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700">
+                <span className="text-gray-500 dark:text-gray-400 block">Total Masuk (Kredit):</span>
+                <span className="font-bold text-green-600 text-sm">
+                  +{formatCurrency(passbook.totalCredit)}
+                </span>
+              </div>
+              <div className="p-3 bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700">
+                <span className="text-gray-500 dark:text-gray-400 block">Total Keluar (Debit):</span>
+                <span className="font-bold text-red-600 text-sm">
+                  -{formatCurrency(passbook.totalDebit)}
+                </span>
+              </div>
+              <div className="p-3 bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700">
+                <span className="text-gray-500 dark:text-gray-400 block">Saldo Akhir:</span>
+                <span className="font-bold text-blue-600 dark:text-blue-400 text-sm">
+                  {formatCurrency(passbook.endBalance)}
+                </span>
+              </div>
+            </div>
+          )}
 
           {loading ? (
             <div className="p-12 text-center text-gray-500">
               <div className="text-4xl mb-2">📖</div>
-              <p>Loading...</p>
+              <p>Memuat mutasi buku tabungan...</p>
             </div>
           ) : transactions.length === 0 ? (
             <div className="p-12 text-center text-gray-500">
               <div className="text-6xl mb-4">📖</div>
-              <p className="text-lg mb-2">Tidak ada transaksi</p>
+              <p className="text-lg font-semibold mb-1 text-gray-700 dark:text-gray-300">
+                Tidak ada transaksi pada periode ini
+              </p>
               <p className="text-sm text-gray-400">
-                Belum ada transaksi tabungan di periode ini
+                Saldo Awal: {passbook ? formatCurrency(passbook.startBalance) : 'Rp 0'} • Saldo Akhir: {passbook ? formatCurrency(passbook.endBalance) : 'Rp 0'}
               </p>
             </div>
           ) : (
@@ -168,91 +349,89 @@ export default function BukuTabunganPage() {
               {/* Table */}
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-gray-50 dark:bg-gray-700 print:bg-gray-100">
+                  <thead className="bg-gray-100 dark:bg-gray-700 print:bg-gray-100 border-b border-gray-200 dark:border-gray-600">
                     <tr>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300 print:text-xs">
+                      <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                         Tanggal
                       </th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300 print:text-xs">
-                        Keterangan
+                      <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                        Keterangan & Rekening
                       </th>
-                      <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700 dark:text-gray-300 print:text-xs">
-                        Debit
+                      <th className="px-4 py-3 text-right text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-wider">
+                        Debit (Keluar)
                       </th>
-                      <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700 dark:text-gray-300 print:text-xs">
-                        Kredit
+                      <th className="px-4 py-3 text-right text-xs font-bold text-green-600 dark:text-green-400 uppercase tracking-wider">
+                        Kredit (Masuk)
                       </th>
-                      <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700 dark:text-gray-300 print:text-xs">
+                      <th className="px-4 py-3 text-right text-xs font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wider">
                         Saldo
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                    {transactions.map((transaction, index) => {
-                      const isDebit = transaction.income > 0 // Ambil tabungan
-                      const isCredit = transaction.expense > 0 // Nabung / Bunga
-
-                      return (
-                        <tr 
-                          key={transaction.id}
-                          className={`${
-                            index % 2 === 0 
-                              ? 'bg-white dark:bg-gray-800' 
-                              : 'bg-gray-50 dark:bg-gray-750'
-                          } print:bg-white`}
-                        >
-                          <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300 print:text-xs">
-                            {formatDate(transaction.date)}
-                          </td>
-                          <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300 print:text-xs">
-                            <div className="flex items-center gap-2">
-                              <span>{transaction.category.icon}</span>
-                              <div>
-                                <div>{transaction.description}</div>
-                                {transaction.savingsLocation && (
-                                  <div className="text-xs text-gray-500 dark:text-gray-400">
-                                    ({transaction.savingsLocation})
-                                  </div>
-                                )}
+                  <tbody className="divide-y divide-gray-200 dark:divide-gray-700 text-sm">
+                    {transactions.map((t, index) => (
+                      <tr 
+                        key={t.id}
+                        className={`${
+                          index % 2 === 0 
+                            ? 'bg-white dark:bg-gray-800' 
+                            : 'bg-gray-50 dark:bg-gray-750'
+                        } hover:bg-blue-50/50 dark:hover:bg-gray-700 transition-colors print:bg-white`}
+                      >
+                        <td className="px-4 py-3 text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                          {formatDate(t.date)}
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex items-start gap-2">
+                            <span className="text-lg">{t.category?.icon || '📝'}</span>
+                            <div>
+                              <div className="font-medium text-gray-800 dark:text-gray-200">
+                                {t.description}
+                              </div>
+                              <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                Kategori: {t.category?.name} • Akun: <span className="font-semibold text-blue-600 dark:text-blue-400">{t.savingsLocation}</span>
                               </div>
                             </div>
-                          </td>
-                          <td className="px-4 py-3 text-sm text-right print:text-xs">
-                            {isDebit ? (
-                              <span className="text-red-600 font-semibold">
-                                {formatCurrency(transaction.income)}
-                              </span>
-                            ) : (
-                              <span className="text-gray-400">-</span>
-                            )}
-                          </td>
-                          <td className="px-4 py-3 text-sm text-right print:text-xs">
-                            {isCredit ? (
-                              <span className="text-green-600 font-semibold">
-                                {formatCurrency(transaction.expense)}
-                              </span>
-                            ) : (
-                              <span className="text-gray-400">-</span>
-                            )}
-                          </td>
-                          <td className="px-4 py-3 text-sm text-right font-bold text-gray-800 dark:text-gray-200 print:text-xs">
-                            {formatCurrency(transaction.runningBalance)}
-                          </td>
-                        </tr>
-                      )
-                    })}
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 text-right whitespace-nowrap">
+                          {t.debit > 0 ? (
+                            <span className="text-red-600 font-semibold font-mono text-sm">
+                              -{formatCurrency(t.debit)}
+                            </span>
+                          ) : (
+                            <span className="text-gray-300 dark:text-gray-600">-</span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 text-right whitespace-nowrap">
+                          {t.credit > 0 ? (
+                            <span className="text-green-600 font-semibold font-mono text-sm">
+                              +{formatCurrency(t.credit)}
+                            </span>
+                          ) : (
+                            <span className="text-gray-300 dark:text-gray-600">-</span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 text-right font-bold text-gray-900 dark:text-gray-100 font-mono text-sm whitespace-nowrap">
+                          {formatCurrency(t.runningBalance)}
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
 
               {/* Footer */}
               <div className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-600 p-6 border-t-2 border-gray-300 dark:border-gray-600 print:bg-gray-50">
-                <div className="flex items-center justify-between">
-                  <div className="text-lg font-bold text-gray-800 dark:text-white">
-                    SALDO AKHIR PERIODE:
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <div className="text-sm font-semibold text-gray-600 dark:text-gray-300">
+                    RINGKASAN AKHIR PERIODE ({months.find(m => m.value === selectedMonth)?.label} {selectedYear})
                   </div>
-                  <div className="text-2xl font-bold text-blue-600 dark:text-blue-400 print:text-xl">
-                    {formatCurrency(currentBalance)}
+                  <div className="text-right">
+                    <span className="text-xs text-gray-500 dark:text-gray-400 block mb-0.5">Saldo Akhir:</span>
+                    <span className="text-2xl font-bold text-blue-600 dark:text-blue-400 font-mono print:text-xl">
+                      {passbook ? formatCurrency(passbook.endBalance) : 'Rp 0'}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -262,7 +441,7 @@ export default function BukuTabunganPage() {
 
         {/* Print Info */}
         <div className="mt-6 text-center text-sm text-gray-500 dark:text-gray-400 print:hidden">
-          <p>💡 Tips: Gunakan tombol Print untuk save sebagai PDF atau print langsung</p>
+          <p>💡 Tips: Gunakan tombol Print untuk export mutasi buku tabungan ke format PDF atau cetak fisik.</p>
         </div>
       </div>
 

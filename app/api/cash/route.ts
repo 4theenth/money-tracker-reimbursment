@@ -1,51 +1,21 @@
 import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { calculateAccountBalances } from '@/lib/accounts'
 
-// GET /api/cash - Calculate current cash on hand (SIMPLIFIED)
+// GET /api/cash - Calculate current cash on hand, total savings, and total wealth
 export async function GET() {
   try {
-    // Get all transactions
-    const transactions = await prisma.transaction.findMany({
-      include: { category: true },
-      orderBy: { date: 'asc' },
-    })
-
-    let cashOnHand = 0
-
-    transactions.forEach(t => {
-      // Only count NON-savings transactions for cash
-      if (!t.isSaving) {
-        // Normal income/expense
-        cashOnHand += t.income
-        cashOnHand -= t.expense
-      }
-    })
-
-    // Calculate total in all savings (SIMPLE: just sum of Tabungan)
-    const savingsTransactions = await prisma.transaction.findMany({
-      where: { 
-        isSaving: true,
-      },
-      include: { category: true },
-    })
-
-    // Total savings = sum of all "Tabungan" expense
-    const totalSavings = savingsTransactions.reduce((sum, t) => {
-      return sum + t.expense
-    }, 0)
-
-    // Total wealth = Cash + Savings
-    const totalWealth = cashOnHand + totalSavings
+    const summary = await calculateAccountBalances()
 
     return NextResponse.json({
-      cashOnHand,
-      totalSavings,
-      totalWealth,
+      cashOnHand: summary.cashOnHand,
+      totalSavings: summary.totalSavings,
+      totalWealth: summary.totalWealth,
+      locationBalances: summary.locationBalances,
     })
   } catch (error) {
-    console.error('Error calculating cash:', error)
+    console.error('Error calculating cash and account balances:', error)
     return NextResponse.json(
-      { error: 'Failed to calculate cash' },
+      { error: 'Failed to calculate cash and account balances' },
       { status: 500 }
     )
   }

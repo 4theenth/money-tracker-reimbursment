@@ -31,7 +31,7 @@ export default function QuickAddTransaction({ onSuccess }: QuickAddProps) {
     description: '',
     type: 'expense',
     amount: '',
-    savingsLocation: '',
+    savingsLocation: 'Tunai / Dompet',
     // Reimbursement fields
     officeCategoryId: '',
     receiptPhoto: '',
@@ -98,7 +98,7 @@ export default function QuickAddTransaction({ onSuccess }: QuickAddProps) {
           description: formData.description,
           income: formData.type === 'income' ? parseFloat(formData.amount) : 0,
           expense: formData.type === 'expense' ? parseFloat(formData.amount) : 0,
-          savingsLocation: formData.savingsLocation || null,
+          savingsLocation: formData.savingsLocation || 'Tunai / Dompet',
         }
 
         const res = await fetch('/api/transactions', {
@@ -122,7 +122,7 @@ export default function QuickAddTransaction({ onSuccess }: QuickAddProps) {
         description: '',
         type: 'expense',
         amount: '',
-        savingsLocation: '',
+        savingsLocation: 'Tunai / Dompet',
         officeCategoryId: '',
         receiptPhoto: '',
         notes: '',
@@ -175,10 +175,14 @@ export default function QuickAddTransaction({ onSuccess }: QuickAddProps) {
         maxWidth="md"
       >
         <form onSubmit={handleSubmit} className="space-y-4">
+                <p className="text-xs text-gray-500 dark:text-gray-400 -mt-2 mb-3">
+                  Kolom dengan tanda <span className="text-status-danger font-bold">*</span> wajib diisi
+                </p>
+
                 {/* Date */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Tanggal
+                    Tanggal <span className="text-status-danger font-bold">*</span>
                   </label>
                   <input
                     type="date"
@@ -192,12 +196,12 @@ export default function QuickAddTransaction({ onSuccess }: QuickAddProps) {
                 {/* Type */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Tipe
+                    Tipe <span className="text-status-danger font-bold">*</span>
                   </label>
                   <div className="grid grid-cols-2 gap-2">
                     <button
                       type="button"
-                      onClick={() => setFormData({ ...formData, type: 'income', categoryId: '', savingsLocation: '' })}
+                      onClick={() => setFormData({ ...formData, type: 'income', categoryId: '' })}
                       className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                         formData.type === 'income'
                           ? 'bg-green-600 text-white'
@@ -208,7 +212,7 @@ export default function QuickAddTransaction({ onSuccess }: QuickAddProps) {
                     </button>
                     <button
                       type="button"
-                      onClick={() => setFormData({ ...formData, type: 'expense', categoryId: '', savingsLocation: '' })}
+                      onClick={() => setFormData({ ...formData, type: 'expense', categoryId: '' })}
                       className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                         formData.type === 'expense'
                           ? 'bg-red-600 text-white'
@@ -223,7 +227,7 @@ export default function QuickAddTransaction({ onSuccess }: QuickAddProps) {
                 {/* Category */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Kategori
+                    Kategori <span className="text-status-danger font-bold">*</span>
                   </label>
                   <select
                     value={formData.categoryId}
@@ -240,19 +244,19 @@ export default function QuickAddTransaction({ onSuccess }: QuickAddProps) {
                   </select>
                 </div>
 
-                {/* Savings Location - Show only for savings categories */}
-                {isSavingsCategory && (
-                  <SavingsLocationField
-                    value={formData.savingsLocation}
-                    onChange={(value) => setFormData({ ...formData, savingsLocation: value })}
-                    required={false}
-                  />
-                )}
+                {/* Sumber Dana / Rekening Pembayaran */}
+                <SavingsLocationField
+                  value={formData.savingsLocation || 'Tunai / Dompet'}
+                  onChange={(value) => setFormData({ ...formData, savingsLocation: value })}
+                  type={formData.type}
+                  isSaving={isSavingsCategory}
+                  required={false}
+                />
 
                 {/* Description */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Keterangan
+                    Keterangan <span className="text-status-danger font-bold">*</span>
                   </label>
                   <textarea
                     value={formData.description}
@@ -267,7 +271,7 @@ export default function QuickAddTransaction({ onSuccess }: QuickAddProps) {
                 {/* Amount */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Jumlah (Rp)
+                    Jumlah (Rp) <span className="text-status-danger font-bold">*</span>
                   </label>
                   <input
                     type="number"

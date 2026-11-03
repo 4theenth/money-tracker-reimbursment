@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
     // Generate unique filename
     const timestamp = Date.now()
     const randomString = Math.random().toString(36).substring(2, 8)
-    const filename = `receipt-${timestamp}-${randomString}.webp`
+    const filename = `receipt-${timestamp}-${randomString}.jpg`
     const filepath = path.join(UPLOAD_DIR, filename)
 
     // Convert file to buffer
@@ -51,14 +51,14 @@ export async function POST(request: NextRequest) {
 
     // Process image with sharp
     // - Resize to max 1200px width (maintain aspect ratio)
-    // - Convert to WebP format
+    // - Convert to JPEG format for universal PDF/Excel compatibility
     // - Compress quality 85%
     await sharp(buffer)
       .resize(1200, null, {
         fit: 'inside',
         withoutEnlargement: true
       })
-      .webp({ quality: 85 })
+      .jpeg({ quality: 85 })
       .toFile(filepath)
 
     // Return public URL path

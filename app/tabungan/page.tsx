@@ -95,21 +95,29 @@ export default function TabunganPage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
-              💎 Tracking Tabungan
-            </h1>
-            <p className="text-gray-600 dark:text-gray-300 mt-1">
-              Monitor perkembangan tabungan per lokasi
-            </p>
-          </div>
+        <div className="mb-6">
           <Link
-            href="/transaksi"
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold shadow-lg transition-colors"
+            href="/"
+            className="inline-flex items-center gap-2 text-brand-primary hover:text-brand-primary-hover font-medium mb-4 transition-colors"
           >
-            + Tambah Tabungan
+            ← Kembali ke Dashboard
           </Link>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
+                💎 Tracking Tabungan
+              </h1>
+              <p className="text-gray-600 dark:text-gray-300 mt-1">
+                Monitor perkembangan tabungan per lokasi
+              </p>
+            </div>
+            <Link
+              href="/transaksi"
+              className="bg-brand-primary hover:bg-brand-primary-hover text-white px-6 py-3 rounded-lg font-semibold shadow-lg transition-colors"
+            >
+              + Tambah Tabungan
+            </Link>
+          </div>
         </div>
 
         {/* Total Summary */}
