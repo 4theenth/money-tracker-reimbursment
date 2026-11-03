@@ -118,10 +118,14 @@ export default function AddCompanyModal({ isOpen, onClose, onSuccess }: Props) {
   return (
     <Modal isOpen={isOpen} onClose={handleClose} title="Tambah Perusahaan">
       <form onSubmit={handleSubmit} className="space-y-4">
+        <p className="text-xs text-gray-500 dark:text-gray-400 -mt-2 mb-3">
+          Kolom dengan tanda <span className="text-status-danger font-bold">*</span> wajib diisi
+        </p>
+
         {/* Company Name */}
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Nama Perusahaan <span className="text-red-500">*</span>
+            Nama Perusahaan <span className="text-status-danger font-bold">*</span>
           </label>
           <input
             type="text"
@@ -137,7 +141,7 @@ export default function AddCompanyModal({ isOpen, onClose, onSuccess }: Props) {
         {/* Logo Upload */}
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Logo Perusahaan <span className="text-gray-500 text-xs">(Opsional)</span>
+            Logo Perusahaan <span className="text-xs text-gray-500 dark:text-gray-400 font-normal">(Opsional)</span>
           </label>
           
           {/* Custom Upload Button */}

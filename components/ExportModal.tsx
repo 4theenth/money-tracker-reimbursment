@@ -33,7 +33,7 @@ interface Props {
 export default function ExportModal({ isOpen, onClose, onExport, onManageCompanies, startDate, endDate }: Props) {
   const [companies, setCompanies] = useState<CompanyProfile[]>([])
   const [loading, setLoading] = useState(true)
-  const { showNotification } = useNotification()
+  const { showError } = useNotification()
   
   // Form state
   const [selectedCompanyId, setSelectedCompanyId] = useState<number | null>(null)
@@ -84,18 +84,18 @@ export default function ExportModal({ isOpen, onClose, onExport, onManageCompani
   const handleExport = (format: 'excel' | 'pdf') => {
     // Validation
     if (!selectedCompanyId) {
-      showNotification({ type: 'error', message: 'Pilih perusahaan terlebih dahulu' })
+      showError('Pilih perusahaan terlebih dahulu')
       return
     }
 
     if (!requestorName.trim()) {
-      showNotification({ type: 'error', message: 'Nama pengaju harus diisi' })
+      showError('Nama pengaju harus diisi')
       return
     }
 
     const selectedCompany = companies.find(c => c.id === selectedCompanyId)
     if (!selectedCompany) {
-      showNotification({ type: 'error', message: 'Perusahaan tidak ditemukan' })
+      showError('Perusahaan tidak ditemukan')
       return
     }
 
@@ -134,7 +134,7 @@ export default function ExportModal({ isOpen, onClose, onExport, onManageCompani
             {/* Company Selector */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Pilih Perusahaan <span className="text-red-500">*</span>
+                Pilih Perusahaan <span className="text-status-danger font-bold">*</span>
               </label>
               
               {companies.length === 0 ? (
@@ -196,7 +196,7 @@ export default function ExportModal({ isOpen, onClose, onExport, onManageCompani
             {/* Requestor Name */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Nama Pengaju <span className="text-red-500">*</span>
+                Nama Pengaju <span className="text-status-danger font-bold">*</span>
               </label>
               <input
                 type="text"
@@ -232,7 +232,7 @@ export default function ExportModal({ isOpen, onClose, onExport, onManageCompani
                 className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
               />
               <label htmlFor="includeApproval" className="text-sm text-gray-700 dark:text-gray-300">
-                Tampilkan bagian approval (tanda tangan)
+                Tampilkan bagian approval (tanda tangan) <span className="text-xs text-gray-500 dark:text-gray-400 font-normal">(Opsional)</span>
               </label>
             </div>
 
