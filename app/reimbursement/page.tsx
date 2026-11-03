@@ -117,7 +117,7 @@ export default function ReimbursementPage() {
         : `Tandai reimbursement "${reimbursement.transaction.description}" sebagai sudah dibayar?`,
       confirmLabel: isPaid ? 'Ya, Belum Dibayar' : 'Ya, Sudah Dibayar',
       cancelLabel: 'Batal',
-      confirmVariant: isPaid ? 'warning' : 'success',
+      confirmVariant: isPaid ? 'primary' : 'success',
       onConfirm: async () => {
         try {
           const res = await fetch(`/api/reimbursements/${reimbursement.id}/status`, {
@@ -250,7 +250,8 @@ export default function ReimbursementPage() {
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = `Reimbursement_${config.selectedMonth}.${fileExtension}`
+      const periodStr = config.selectedMonth || (config.startDate && config.endDate ? `${config.startDate}_to_${config.endDate}` : 'export')
+      a.download = `Reimbursement_${periodStr}.${fileExtension}`
       document.body.appendChild(a)
       a.click()
       window.URL.revokeObjectURL(url)
@@ -555,9 +556,9 @@ export default function ReimbursementPage() {
                         </button>
                       </div>
 
-                      {reimb.claimedAt && (
+                      {reimb.paidDate && (
                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                          Dibayar: {formatDate(reimb.claimedAt)}
+                          Dibayar: {formatDate(reimb.paidDate)}
                         </p>
                       )}
                     </div>
@@ -585,10 +586,14 @@ export default function ReimbursementPage() {
               </h2>
 
               <form onSubmit={handleSubmit} className="space-y-4">
+                <p className="text-xs text-gray-500 dark:text-gray-400 -mt-2 mb-3">
+                  Kolom dengan tanda <span className="text-status-danger font-bold">*</span> wajib diisi
+                </p>
+
                 {/* Date */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Tanggal <span className="text-red-500">*</span>
+                    Tanggal <span className="text-status-danger font-bold">*</span>
                   </label>
                   <input
                     type="date"
@@ -602,7 +607,7 @@ export default function ReimbursementPage() {
                 {/* Office Category */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Kategori Kantor <span className="text-red-500">*</span>
+                    Kategori Kantor <span className="text-status-danger font-bold">*</span>
                   </label>
                   <select
                     value={formData.officeCategoryId}
@@ -622,7 +627,7 @@ export default function ReimbursementPage() {
                 {/* Description */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Deskripsi <span className="text-red-500">*</span>
+                    Deskripsi <span className="text-status-danger font-bold">*</span>
                   </label>
                   <input
                     type="text"
@@ -637,7 +642,7 @@ export default function ReimbursementPage() {
                 {/* Amount */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Jumlah (Rp) <span className="text-red-500">*</span>
+                    Jumlah (Rp) <span className="text-status-danger font-bold">*</span>
                   </label>
                   <input
                     type="number"
@@ -654,7 +659,7 @@ export default function ReimbursementPage() {
                 {/* Receipt Photo Upload */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Foto Nota (opsional)
+                    Foto Nota <span className="text-xs text-gray-500 dark:text-gray-400 font-normal">(Opsional)</span>
                   </label>
                   <ImageUpload
                     currentImage={formData.receiptPhoto}
@@ -666,7 +671,7 @@ export default function ReimbursementPage() {
                 {/* Notes */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Keterangan Tambahan (opsional)
+                    Keterangan Tambahan <span className="text-xs text-gray-500 dark:text-gray-400 font-normal">(Opsional)</span>
                   </label>
                   <textarea
                     value={formData.notes}
