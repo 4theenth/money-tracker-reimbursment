@@ -301,7 +301,7 @@ export default function BukuTabunganPage() {
 
           {/* Quick Balance Cards on Top of Table */}
           {passbook && (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 p-4 bg-gray-50 dark:bg-gray-750 border-b border-gray-200 dark:border-gray-700 text-xs">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 p-4 bg-gray-50 dark:bg-gray-800/90 border-b border-gray-200 dark:border-gray-700 text-xs">
               <div className="p-3 bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700">
                 <span className="text-gray-500 dark:text-gray-400 block">Saldo Awal:</span>
                 <span className="font-bold text-gray-800 dark:text-gray-200 text-sm">
@@ -375,7 +375,7 @@ export default function BukuTabunganPage() {
                         className={`${
                           index % 2 === 0 
                             ? 'bg-white dark:bg-gray-800' 
-                            : 'bg-gray-50 dark:bg-gray-750'
+                            : 'bg-gray-50/60 dark:bg-gray-800/50'
                         } hover:bg-blue-50/50 dark:hover:bg-gray-700 transition-colors print:bg-white`}
                       >
                         <td className="px-4 py-3 text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap">
