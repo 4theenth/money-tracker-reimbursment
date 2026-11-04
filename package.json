@@ -9,6 +9,7 @@
     "lint": "eslint",
     "seed": "tsx prisma/seed.ts",
     "seed-savings": "tsx prisma/seed-savings.ts",
+    "seed-budget": "tsx prisma/seed-budget.ts",
     "postinstall": "prisma skills sync || exit 0"
   },
   "prisma": {

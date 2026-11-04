@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { formatCurrency } from '@/lib/utils'
+import { getBudgetPlanningData } from '@/lib/budget'
 import Link from 'next/link'
 import QuickAddTransaction from '@/components/QuickAddTransaction'
 
@@ -36,6 +37,17 @@ export default async function Home() {
 
   // Get cash and savings data
   const cashData = await getCashData()
+
+  // Get budget planning data for current month
+  const now = new Date()
+  const currentMonth = now.getMonth() + 1
+  const currentYear = now.getFullYear()
+  let budgetData = null
+  try {
+    budgetData = await getBudgetPlanningData(currentMonth, currentYear)
+  } catch (error) {
+    console.error('Error fetching budget data for homepage:', error)
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
@@ -130,6 +142,107 @@ export default async function Home() {
           </Link>
         </div>
 
+        {/* Budget Health / Spending Target Banner Card */}
+        {budgetData && budgetData.period.isConfigured && (
+          <Link
+            href="/budget"
+            className="mb-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-5 border-2 border-transparent hover:border-amber-500/40 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 group block cursor-pointer"
+          >
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+              <div className="flex items-center gap-3.5">
+                <div className="w-12 h-12 rounded-xl bg-amber-100 dark:bg-amber-950/60 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                  🎯
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-base font-bold text-gray-800 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+                      Rencana Anggaran ({budgetData.period.label})
+                    </h3>
+                    <span className="text-[11px] px-2 py-0.5 rounded-full font-semibold bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300">
+                      Target Bulanan
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Realisasi:{' '}
+                    <span className="font-semibold text-gray-800 dark:text-gray-200">
+                      {formatCurrency(budgetData.totalActualExpense)}
+                    </span>{' '}
+                    dari target{' '}
+                    <span className="font-semibold text-gray-800 dark:text-gray-200">
+                      {formatCurrency(budgetData.totalTargetExpense)}
+                    </span>
+                  </p>
+                </div>
+              </div>
+
+              {/* Progress Bar Container */}
+              <div className="flex-1 max-w-lg">
+                <div className="flex items-center justify-between text-xs mb-1.5 font-medium">
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Sisa Kuota:{' '}
+                    <strong
+                      className={
+                        budgetData.totalExpenseDifference >= 0
+                          ? 'text-emerald-600 dark:text-emerald-400 font-mono'
+                          : 'text-rose-600 dark:text-rose-400 font-mono'
+                      }
+                    >
+                      {budgetData.totalExpenseDifference >= 0 ? '+' : '-'}
+                      {formatCurrency(Math.abs(budgetData.totalExpenseDifference))}
+                    </strong>
+                  </span>
+                  <span
+                    className={`font-mono font-bold ${
+                      budgetData.totalExpensePercentage > 100
+                        ? 'text-rose-600 dark:text-rose-400'
+                        : budgetData.totalExpensePercentage >= 80
+                        ? 'text-amber-600 dark:text-amber-400'
+                        : 'text-emerald-600 dark:text-emerald-400'
+                    }`}
+                  >
+                    {budgetData.totalExpensePercentage}% Terpakai
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 dark:bg-gray-700 h-2.5 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full rounded-full transition-all duration-300 ${
+                      budgetData.totalExpensePercentage > 100
+                        ? 'bg-rose-500 animate-pulse'
+                        : budgetData.totalExpensePercentage >= 80
+                        ? 'bg-amber-500'
+                        : 'bg-emerald-500'
+                    }`}
+                    style={{
+                      width: `${Math.min(budgetData.totalExpensePercentage, 100)}%`,
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Health Badges & Arrow */}
+              <div className="flex items-center justify-between lg:justify-end gap-3 pt-2 lg:pt-0 border-t lg:border-t-0 border-gray-100 dark:border-gray-700">
+                <div className="flex items-center gap-1.5 text-xs font-semibold">
+                  <span className="text-emerald-600 dark:text-emerald-400">
+                    🟢 {budgetData.statusCounts.ok}
+                  </span>
+                  <span>•</span>
+                  <span className="text-amber-600 dark:text-amber-400">
+                    🟡 {budgetData.statusCounts.alert}
+                  </span>
+                  <span>•</span>
+                  <span className="text-rose-600 dark:text-rose-400">
+                    🔴 {budgetData.statusCounts.over}
+                  </span>
+                </div>
+                <span className="text-xs font-bold text-gray-400 group-hover:text-amber-500 group-hover:translate-x-1 transition-all flex items-center gap-1">
+                  <span>Lihat Detail</span>
+                  <span>→</span>
+                </span>
+              </div>
+            </div>
+          </Link>
+        )}
+
         {/* Summary Cards - Income & Expense */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <Link
@@ -180,7 +293,7 @@ export default async function Home() {
             Akses cepat fitur aplikasi
           </span>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
           <Link
             href="/transaksi"
             className="group relative bg-white dark:bg-gray-800 rounded-xl p-5 border-2 border-emerald-500/20 hover:border-emerald-500 shadow hover:shadow-xl hover:-translate-y-1 active:scale-[0.98] transition-all duration-200 cursor-pointer block"
@@ -238,6 +351,26 @@ export default async function Home() {
             </h3>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
               Saldo rekening bank & passbook
+            </p>
+          </Link>
+
+          <Link
+            href="/budget"
+            className="group relative bg-white dark:bg-gray-800 rounded-xl p-5 border-2 border-amber-500/20 hover:border-amber-500 shadow hover:shadow-xl hover:-translate-y-1 active:scale-[0.98] transition-all duration-200 cursor-pointer block"
+          >
+            <div className="flex items-start justify-between mb-3">
+              <div className="w-12 h-12 rounded-xl bg-amber-100 dark:bg-amber-950/60 flex items-center justify-center text-2xl shadow-sm group-hover:scale-110 transition-transform">
+                🎯
+              </div>
+              <span className="text-amber-500 group-hover:translate-x-1 transition-transform text-base font-bold">
+                →
+              </span>
+            </div>
+            <h3 className="text-base font-bold text-gray-800 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+              Anggaran
+            </h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              Target belanja & status pos
             </p>
           </Link>
 
