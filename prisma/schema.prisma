@@ -26,6 +26,7 @@ model Category {
   updatedAt   DateTime @updatedAt
 
   transactions Transaction[]
+  budgetItems  BudgetItem[]
 
   @@map("categories")
 }
@@ -123,3 +124,40 @@ model CompanyProfile {
 
   @@map("company_profiles")
 }
+
+// ============================================
+// BUDGET PLANNING MODULE
+// ============================================
+
+model BudgetPeriod {
+  id           Int          @id @default(autoincrement())
+  month        Int          // 1 - 12
+  year         Int          // e.g. 2026
+  targetIncome Float        @default(0) // Total target pendapatan bulanan
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  items        BudgetItem[]
+
+  @@unique([month, year])
+  @@index([year, month])
+  @@map("budget_periods")
+}
+
+model BudgetItem {
+  id             Int          @id @default(autoincrement())
+  budgetPeriodId Int
+  categoryId     Int
+  targetAmount   Float        @default(0) // Target alokasi pengeluaran per kategori
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  budgetPeriod   BudgetPeriod @relation(fields: [budgetPeriodId], references: [id], onDelete: Cascade)
+  category       Category     @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([budgetPeriodId, categoryId])
+  @@index([budgetPeriodId])
+  @@index([categoryId])
+  @@map("budget_items")
+}
+
