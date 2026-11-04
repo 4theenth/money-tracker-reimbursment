@@ -102,18 +102,7 @@ export async function DELETE(
       )
     }
 
-    // Check if category is used in transactions
-    if (existing._count.transactions > 0) {
-      return NextResponse.json(
-        { 
-          error: `Kategori ini digunakan oleh ${existing._count.transactions} transaksi. Kategori akan dinonaktifkan.`,
-          transactionCount: existing._count.transactions 
-        },
-        { status: 400 }
-      )
-    }
-
-    // Soft delete: set isActive to false
+    // Soft delete: set isActive to false so historical transactions remain intact
     const category = await prisma.category.update({
       where: { id },
       data: { isActive: false },
@@ -122,6 +111,7 @@ export async function DELETE(
     return NextResponse.json({
       message: 'Category deactivated successfully',
       category,
+      transactionCount: existing._count.transactions,
     })
   } catch (error) {
     console.error('Error deleting category:', error)
