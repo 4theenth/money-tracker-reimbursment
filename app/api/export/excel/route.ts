@@ -26,25 +26,30 @@ export async function POST(request: NextRequest) {
 
     // NEW: Support date range
     if (reqStartDate && reqEndDate) {
-      startDate = new Date(reqStartDate)
-      startDate.setHours(0, 0, 0, 0)
-      
-      endDate = new Date(reqEndDate)
-      endDate.setHours(23, 59, 59, 999)
+      const [sYear, sMonth, sDay] = reqStartDate.split('-').map(Number)
+      const [eYear, eMonth, eDay] = reqEndDate.split('-').map(Number)
 
-      // Format period label: "1 Oktober 2026 - 31 Oktober 2026"
+      // Timezone-safe boundaries covering both local and UTC representations
+      startDate = new Date(Math.min(
+        new Date(sYear, sMonth - 1, sDay, 0, 0, 0, 0).getTime(),
+        Date.UTC(sYear, sMonth - 1, sDay, 0, 0, 0, 0)
+      ))
+      endDate = new Date(Math.max(
+        new Date(eYear, eMonth - 1, eDay, 23, 59, 59, 999).getTime(),
+        Date.UTC(eYear, eMonth - 1, eDay, 23, 59, 59, 999)
+      ))
+
+      // Format period label in formal Indonesian matching UI
       const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember']
-      const startDay = startDate.getDate()
-      const startMonth = months[startDate.getMonth()]
-      const startYear = startDate.getFullYear()
-      const endDay = endDate.getDate()
-      const endMonth = months[endDate.getMonth()]
-      const endYear = endDate.getFullYear()
+      const startDay = sDay
+      const startMonth = months[sMonth - 1]
+      const startYear = sYear
+      const endDay = eDay
+      const endMonth = months[eMonth - 1]
+      const endYear = eYear
 
-      if (startYear === endYear && startMonth === endMonth) {
-        periodLabel = `${startDay} - ${endDay} ${startMonth} ${startYear}`
-      } else if (startYear === endYear) {
-        periodLabel = `${startDay} ${startMonth} - ${endDay} ${endMonth} ${startYear}`
+      if (reqStartDate === reqEndDate) {
+        periodLabel = `${startDay} ${startMonth} ${startYear}`
       } else {
         periodLabel = `${startDay} ${startMonth} ${startYear} - ${endDay} ${endMonth} ${endYear}`
       }

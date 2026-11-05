@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Modal from './Modal'
 import { useNotification } from '@/contexts/NotificationContext'
+import { formatLocalDate } from '@/lib/utils'
 
 interface CompanyProfile {
   id: number
@@ -107,8 +108,8 @@ export default function ExportModal({ isOpen, onClose, onExport, onManageCompani
       companyLogo: selectedCompany.logoPath,
       requestorName,
       includeApproval,
-      startDate: startDate.toISOString().split('T')[0],
-      endDate: endDate.toISOString().split('T')[0]
+      startDate: formatLocalDate(startDate),
+      endDate: formatLocalDate(endDate)
     }
 
     // Save to localStorage for next time

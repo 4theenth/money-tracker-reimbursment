@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useNotification } from '@/contexts/NotificationContext'
-import { formatCurrency, formatDate } from '@/lib/utils'
+import { formatCurrency, formatDate, formatLocalDate } from '@/lib/utils'
 import ImageUpload from '@/components/ImageUpload'
 import ExportModal from '@/components/ExportModal'
 import CompanyManagementModal from '@/components/CompanyManagementModal'
@@ -61,7 +61,7 @@ export default function ReimbursementPage() {
   const [isExportModalOpen, setIsExportModalOpen] = useState(false)
   const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false)
   const [formData, setFormData] = useState({
-    date: new Date().toISOString().split('T')[0],
+    date: formatLocalDate(new Date()),
     officeCategoryId: '',
     description: '',
     amount: '',
@@ -90,9 +90,9 @@ export default function ReimbursementPage() {
       setLoading(true)
       const params = new URLSearchParams()
       
-      // NEW: Use date range
-      params.append('startDate', startDate.toISOString().split('T')[0])
-      params.append('endDate', endDate.toISOString().split('T')[0])
+      // Use local date string
+      params.append('startDate', formatLocalDate(startDate))
+      params.append('endDate', formatLocalDate(endDate))
       
       if (statusFilter) params.append('status', statusFilter)
 
@@ -210,7 +210,7 @@ export default function ReimbursementPage() {
       showSuccess('Reimbursement berhasil ditambahkan!')
       setIsFormOpen(false)
       setFormData({
-        date: new Date().toISOString().split('T')[0],
+        date: formatLocalDate(new Date()),
         officeCategoryId: '',
         description: '',
         amount: '',
