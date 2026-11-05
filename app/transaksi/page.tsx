@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { formatCurrency, formatDate } from '@/lib/utils'
+import { formatCurrency, formatDate, formatLocalDate } from '@/lib/utils'
 import { useNotification } from '@/contexts/NotificationContext'
 import Modal from '@/components/Modal'
 import ReimbursementFormFields from '@/components/ReimbursementFormFields'
@@ -37,7 +37,7 @@ export default function TransaksiPage() {
 
   // Form state
   const [formData, setFormData] = useState({
-    date: new Date().toISOString().split('T')[0],
+    date: formatLocalDate(new Date()),
     categoryId: '',
     description: '',
     type: 'expense',
@@ -176,7 +176,7 @@ export default function TransaksiPage() {
 
       // Reset form
       setFormData({
-        date: new Date().toISOString().split('T')[0],
+        date: formatLocalDate(new Date()),
         categoryId: '',
         description: '',
         type: 'expense',
@@ -198,7 +198,7 @@ export default function TransaksiPage() {
   const handleEdit = (transaction: Transaction) => {
     setEditingId(transaction.id)
     setFormData({
-      date: new Date(transaction.date).toISOString().split('T')[0],
+      date: formatLocalDate(transaction.date),
       categoryId: transaction.categoryId.toString(),
       description: transaction.description,
       type: transaction.income > 0 ? 'income' : 'expense',
@@ -273,7 +273,7 @@ export default function TransaksiPage() {
               setIsFormOpen(true)
               setEditingId(null)
               setFormData({
-                date: new Date().toISOString().split('T')[0],
+                date: formatLocalDate(new Date()),
                 categoryId: '',
                 description: '',
                 type: 'expense',
