@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from 'react'
 import { formatCurrency } from '@/lib/utils'
+import { CATEGORY_NAME_MAX_LENGTH } from '@/lib/category-name'
 import { useNotification } from '@/contexts/NotificationContext'
 import { emojiOptions } from '@/lib/config/emojis'
 import Modal from '@/components/Modal'
-import Link from 'next/link'
 
 interface BudgetItemDetail {
   id?: number
@@ -505,16 +505,10 @@ export default function BudgetPlanningPage() {
   const modalUnallocated = modalIncome - modalTotalExpenses
 
   return (
-    <div className="min-h-screen bg-paper p-4 md:p-8">
+    <div className="p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-6">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 text-accent hover:text-accent-hover font-medium mb-4 transition-colors"
-          >
-            ← Kembali ke Dashboard
-          </Link>
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <h1 className="text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
@@ -612,7 +606,7 @@ export default function BudgetPlanningPage() {
         ) : !data ? null : (
           <>
             {/* Top Summary Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
               {/* Card 1: Target Pendapatan */}
               <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5">
                 <div className="flex items-center justify-between">
@@ -693,7 +687,7 @@ export default function BudgetPlanningPage() {
                     >
                       {formatCurrency(data.unallocatedBudget)}
                     </p>
-                    <div className="flex items-center gap-1.5 mt-2 text-xs font-medium">
+                    <div className="flex flex-wrap items-center gap-1.5 mt-2 text-xs font-medium">
                       <span className="text-income">
                         🟢 {data.statusCounts.ok} OK
                       </span>
@@ -1036,10 +1030,12 @@ export default function BudgetPlanningPage() {
                       type="text"
                       value={newCategoryName}
                       onChange={(e) => setNewCategoryName(e.target.value)}
+                      maxLength={CATEGORY_NAME_MAX_LENGTH}
                       placeholder="Contoh: Skincare, Cicilan, Kado"
                       className="w-full px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-accent"
                       autoFocus
                     />
+                    <p className="mt-1 text-right text-xs text-ink-muted">{newCategoryName.length}/{CATEGORY_NAME_MAX_LENGTH}</p>
                   </div>
 
                   <div>

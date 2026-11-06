@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { categoryNameError, normalizeCategoryName } from '@/lib/category-name'
 
 // GET /api/reimbursement-categories - Get all reimbursement categories
 export async function GET(request: NextRequest) {
@@ -26,13 +27,12 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { name, icon } = body
+    const { icon } = body
+    const name = normalizeCategoryName(body.name)
 
-    if (!name) {
-      return NextResponse.json(
-        { error: 'Name is required' },
-        { status: 400 }
-      )
+    const nameError = categoryNameError(name)
+    if (nameError) {
+      return NextResponse.json({ error: nameError }, { status: 400 })
     }
 
     // Check duplicate

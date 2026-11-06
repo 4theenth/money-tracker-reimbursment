@@ -128,14 +128,14 @@ export default function DateRangePicker({
             dropdownMode="select"
             yearDropdownItemNumber={50}
             scrollableYearDropdown
-            className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-accent"
             calendarClassName="custom-datepicker"
             wrapperClassName="w-full"
           />
         </div>
 
         <div className="flex items-center justify-center pt-6">
-          <span className="text-gray-400">→</span>
+          <span aria-hidden="true" className="text-ink-muted">→</span>
         </div>
 
         <div className="flex-1">
@@ -152,7 +152,7 @@ export default function DateRangePicker({
             dropdownMode="select"
             yearDropdownItemNumber={50}
             scrollableYearDropdown
-            className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-accent"
             calendarClassName="custom-datepicker"
             wrapperClassName="w-full"
           />
@@ -165,8 +165,8 @@ export default function DateRangePicker({
           onClick={applyThisMonth}
           className={`px-3 py-1.5 text-sm rounded-lg transition-colors font-medium ${
             activeFilter === 'this_month'
-              ? 'bg-blue-600 text-white shadow-lg'
-              : 'bg-slate-700 hover:bg-slate-600 text-white'
+              ? 'bg-brand-primary text-white'
+              : 'bg-gray-200 hover:bg-gray-300 text-ink dark:bg-gray-700 dark:hover:bg-gray-600'
           }`}
         >
           📅 Bulan Ini
@@ -175,8 +175,8 @@ export default function DateRangePicker({
           onClick={applyLast3Months}
           className={`px-3 py-1.5 text-sm rounded-lg transition-colors font-medium ${
             activeFilter === '3_months'
-              ? 'bg-blue-600 text-white shadow-lg'
-              : 'bg-slate-700 hover:bg-slate-600 text-white'
+              ? 'bg-brand-primary text-white'
+              : 'bg-gray-200 hover:bg-gray-300 text-ink dark:bg-gray-700 dark:hover:bg-gray-600'
           }`}
         >
           📆 3 Bulan Terakhir
@@ -185,8 +185,8 @@ export default function DateRangePicker({
           onClick={applyThisYear}
           className={`px-3 py-1.5 text-sm rounded-lg transition-colors font-medium ${
             activeFilter === 'this_year'
-              ? 'bg-blue-600 text-white shadow-lg'
-              : 'bg-slate-700 hover:bg-slate-600 text-white'
+              ? 'bg-brand-primary text-white'
+              : 'bg-gray-200 hover:bg-gray-300 text-ink dark:bg-gray-700 dark:hover:bg-gray-600'
           }`}
         >
           📊 Tahun Ini

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { categoryNameError, normalizeCategoryName } from '@/lib/category-name'
 
 // GET /api/categories - Get all categories
 export async function GET(request: Request) {
@@ -26,10 +27,16 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { name, type, icon, color } = body
+    const { type, icon, color } = body
+    const name = normalizeCategoryName(body.name)
 
     // Validation
-    if (!name || !type) {
+    const nameError = categoryNameError(name)
+    if (nameError) {
+      return NextResponse.json({ error: nameError }, { status: 400 })
+    }
+
+    if (!type) {
       return NextResponse.json(
         { error: 'Name and type are required' },
         { status: 400 }

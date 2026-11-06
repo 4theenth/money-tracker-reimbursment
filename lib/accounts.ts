@@ -15,6 +15,50 @@ export interface BalancesSummary {
   breakdown: AccountBalance[]
 }
 
+export interface MonthlyCashFlow {
+  key: string
+  label: string
+  income: number
+  expense: number
+}
+
+// Moving money between Tunai and a savings account is neither income nor spending
+const TRANSFER_CATEGORIES = ['Tabungan', 'Penarikan Tabungan']
+
+export async function getMonthlyCashFlow(months = 6): Promise<MonthlyCashFlow[]> {
+  const now = new Date()
+  const start = new Date(now.getFullYear(), now.getMonth() - (months - 1), 1)
+
+  const flow: MonthlyCashFlow[] = Array.from({ length: months }, (_, index) => {
+    const month = new Date(start.getFullYear(), start.getMonth() + index, 1)
+    return {
+      key: `${month.getFullYear()}-${month.getMonth()}`,
+      label: month.toLocaleDateString('id-ID', { month: 'short' }),
+      income: 0,
+      expense: 0,
+    }
+  })
+
+  const transactions = await prisma.transaction.findMany({
+    where: {
+      date: { gte: start },
+      category: { name: { notIn: TRANSFER_CATEGORIES } },
+    },
+    select: { date: true, income: true, expense: true },
+  })
+
+  for (const transaction of transactions) {
+    const date = new Date(transaction.date)
+    const month = flow.find((entry) => entry.key === `${date.getFullYear()}-${date.getMonth()}`)
+    if (month) {
+      month.income += transaction.income
+      month.expense += transaction.expense
+    }
+  }
+
+  return flow
+}
+
 /**
  * Calculate balances for all accounts/locations and overall cash & savings summary
  */

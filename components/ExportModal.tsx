@@ -145,8 +145,8 @@ export default function ExportModal({ isOpen, onClose, onExport, onManageCompani
               </label>
               
               {companies.length === 0 ? (
-                <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-300 dark:border-yellow-700 rounded-lg">
-                  <p className="text-sm text-yellow-800 dark:text-yellow-200 mb-2">
+                <div className="p-4 bg-status-warning-light border border-gray-200 dark:border-gray-700 rounded-lg">
+                  <p className="text-sm text-caution mb-2">
                     Belum ada perusahaan tersimpan
                   </p>
                   <button
@@ -154,7 +154,7 @@ export default function ExportModal({ isOpen, onClose, onExport, onManageCompani
                       onClose()
                       onManageCompanies()
                     }}
-                    className="text-sm bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded"
+                    className="text-sm bg-caution-solid hover:bg-caution-solid-hover text-white px-4 py-2 rounded"
                   >
                     ➕ Tambah Perusahaan
                   </button>
@@ -164,7 +164,7 @@ export default function ExportModal({ isOpen, onClose, onExport, onManageCompani
                   <select
                     value={selectedCompanyId || ''}
                     onChange={(e) => setSelectedCompanyId(parseInt(e.target.value))}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent dark:bg-gray-700 dark:text-white"
                   >
                     <option value="">-- Pilih Perusahaan --</option>
                     {companies.map((company) => (
@@ -192,7 +192,7 @@ export default function ExportModal({ isOpen, onClose, onExport, onManageCompani
                       onClose()
                       onManageCompanies()
                     }}
-                    className="text-xs text-purple-600 hover:text-purple-700 dark:text-purple-400 mt-2"
+                    className="text-xs text-accent hover:text-accent-hover mt-2"
                   >
                     🏢 Kelola Perusahaan
                   </button>
@@ -209,13 +209,13 @@ export default function ExportModal({ isOpen, onClose, onExport, onManageCompani
                 type="text"
                 value={requestorName}
                 onChange={(e) => setRequestorName(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent dark:bg-gray-700 dark:text-white"
                 placeholder="Nama Anda"
               />
             </div>
 
             {/* Export Period */}
-            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+            <div className="bg-status-info-light border border-gray-200 dark:border-gray-700 rounded-lg p-3">
               <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Periode Export
               </p>
@@ -242,7 +242,7 @@ export default function ExportModal({ isOpen, onClose, onExport, onManageCompani
                 id="includeApproval"
                 checked={includeApproval}
                 onChange={(e) => setIncludeApproval(e.target.checked)}
-                className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                className="w-4 h-4 accent-[var(--color-accent)] border-gray-300 rounded focus:ring-accent"
               />
               <label htmlFor="includeApproval" className="text-sm text-gray-700 dark:text-gray-300">
                 Tampilkan bagian approval (tanda tangan) <span className="text-xs text-gray-500 dark:text-gray-400 font-normal">(Opsional)</span>
@@ -254,14 +254,14 @@ export default function ExportModal({ isOpen, onClose, onExport, onManageCompani
               <button
                 onClick={() => handleExport('excel')}
                 disabled={loading || companies.length === 0}
-                className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+                className="flex-1 bg-income-solid hover:bg-income-solid-hover disabled:bg-gray-400 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
               >
                 📥 Export Excel
               </button>
               <button
                 onClick={() => handleExport('pdf')}
                 disabled={loading || companies.length === 0}
-                className="flex-1 bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+                className="flex-1 bg-expense-solid hover:bg-expense-solid-hover disabled:bg-gray-400 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
               >
                 📄 Export PDF
               </button>

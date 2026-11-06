@@ -143,7 +143,7 @@ export default function EmojiManagerPage() {
   }
 
   return (
-    <div className="min-h-screen bg-paper p-4 md:p-8">
+    <div className="p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-6">

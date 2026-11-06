@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { useNotification } from '@/contexts/NotificationContext'
-import Link from 'next/link'
 
 interface Transaction {
   id: number
@@ -171,17 +170,11 @@ export default function BukuTabunganPage() {
   const transactions = passbook?.transactions || []
 
   return (
-    <div className="min-h-screen bg-paper p-4 md:p-8">
+    <div className="p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6 print:mb-4">
           <div>
-            <Link 
-              href="/tabungan"
-              className="text-accent hover:text-accent-hover text-sm mb-2 inline-flex items-center gap-1 font-medium print:hidden"
-            >
-              ← Kembali ke Dashboard Tabungan
-            </Link>
             <h1 className="text-3xl font-bold text-gray-800 dark:text-white print:text-2xl">
               📖 Buku Tabungan & Mutasi Rekening
             </h1>
