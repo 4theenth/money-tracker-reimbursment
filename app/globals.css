@@ -150,12 +150,12 @@
 
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --background: #141e24;
+  --background: #0b1115;
   --foreground: #e6ecea;
 
   /* Page Palette */
-  --color-paper: #141e24;
-  --color-surface: #1c2830;
+  --color-paper: #0b1115;
+  --color-surface: #12191e;
   --color-ink: #e6ecea;
   --color-ink-muted: #a3b1b8;
   --color-accent: #8fbcd8;
@@ -183,19 +183,26 @@
   /* Hairlines and chart marks */
   --chart-income: #6a9abb;
   --chart-expense: #5a6a73;
-  --line: #2a3842;
+  --line: #1c262d;
 
   /* Neutral Colors - Dark Mode (inverted) */
-  --color-neutral-50: #141e24;
-  --color-neutral-100: #1c2830;
-  --color-neutral-200: #2a3842;
-  --color-neutral-300: #485860;
+  --color-neutral-50: #0b1115;
+  --color-neutral-100: #12191e;
+  --color-neutral-200: #1c262d;
+  --color-neutral-300: #33414a;
   --color-neutral-400: #5f6f78;
   --color-neutral-500: #8e9da5;
   --color-neutral-600: #bfcac9;
   --color-neutral-700: #d8dfdd;
   --color-neutral-800: #e9edea;
   --color-neutral-900: #f4f6f3;
+
+  /* Dark surfaces use their own gray steps; light mode keeps these grays for text */
+  --color-gray-600: #33414a;
+  --color-gray-700: #1c262d;
+  --color-gray-800: #12191e;
+  --color-gray-900: #0b1115;
+  --color-gray-950: #070b0e;
 }
 
 body {
