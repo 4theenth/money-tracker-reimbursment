@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
 
     if (reimbursements.length === 0) {
       return NextResponse.json(
-        { error: 'Tidak ada data reimbursement untuk bulan ini' },
+        { error: 'Tidak ada data reimbursement untuk periode ini' },
         { status: 404 }
       )
     }

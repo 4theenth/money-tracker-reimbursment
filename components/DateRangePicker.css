@@ -1,5 +1,10 @@
 /* Custom DatePicker Dark Theme Styling */
 
+/* Keep the calendar above modals (z-50) when rendered in a portal */
+.react-datepicker-popper {
+  z-index: 60 !important;
+}
+
 .custom-datepicker {
   background-color: #1e293b !important;
   border: 1px solid #475569 !important;

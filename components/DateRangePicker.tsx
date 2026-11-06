@@ -11,17 +11,18 @@ interface Props {
   onStartDateChange: (date: Date) => void
   onEndDateChange: (date: Date) => void
   onQuickFilter: (start: Date, end: Date) => void
+  /** Render the calendar in a body-level portal so a scrollable parent (e.g. a modal) can't clip it */
+  calendarPortalId?: string
 }
 
-export default function DateRangePicker({ 
-  startDate, 
-  endDate, 
-  onStartDateChange, 
+export default function DateRangePicker({
+  startDate,
+  endDate,
+  onStartDateChange,
   onEndDateChange,
-  onQuickFilter 
+  onQuickFilter,
+  calendarPortalId
 }: Props) {
-  const [localStart, setLocalStart] = useState(startDate)
-  const [localEnd, setLocalEnd] = useState(endDate)
   const [activeFilter, setActiveFilter] = useState<'this_month' | '3_months' | 'this_year' | 'custom'>('custom')
 
   // Detect which filter is active based on dates
@@ -88,13 +89,11 @@ export default function DateRangePicker({
   const handleStartChange = (date: Date | null) => {
     if (!date) return
     
-    if (date > localEnd) {
+    if (date > endDate) {
       // Auto-adjust end date to match start
-      setLocalEnd(date)
       onEndDateChange(date)
     }
-    
-    setLocalStart(date)
+
     onStartDateChange(date)
     setActiveFilter('custom') // Manual change = custom
   }
@@ -102,13 +101,11 @@ export default function DateRangePicker({
   const handleEndChange = (date: Date | null) => {
     if (!date) return
     
-    if (date < localStart) {
+    if (date < startDate) {
       // Auto-adjust start date to match end
-      setLocalStart(date)
       onStartDateChange(date)
     }
-    
-    setLocalEnd(date)
+
     onEndDateChange(date)
     setActiveFilter('custom') // Manual change = custom
   }
@@ -118,12 +115,13 @@ export default function DateRangePicker({
       {/* Date Pickers */}
       <div className="flex items-center gap-3">
         <div className="flex-1">
-          <label className="block text-sm font-medium text-gray-300 mb-1">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Tanggal Mulai
           </label>
           <DatePicker
-            selected={localStart}
+            selected={startDate}
             onChange={handleStartChange}
+            portalId={calendarPortalId}
             dateFormat="dd/MM/yyyy"
             showMonthDropdown
             showYearDropdown
@@ -141,12 +139,13 @@ export default function DateRangePicker({
         </div>
 
         <div className="flex-1">
-          <label className="block text-sm font-medium text-gray-300 mb-1">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Tanggal Akhir
           </label>
           <DatePicker
-            selected={localEnd}
+            selected={endDate}
             onChange={handleEndChange}
+            portalId={calendarPortalId}
             dateFormat="dd/MM/yyyy"
             showMonthDropdown
             showYearDropdown
@@ -161,7 +160,7 @@ export default function DateRangePicker({
       </div>
 
       {/* Quick Filters */}
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         <button
           onClick={applyThisMonth}
           className={`px-3 py-1.5 text-sm rounded-lg transition-colors font-medium ${
