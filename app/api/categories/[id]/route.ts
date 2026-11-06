@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { categoryNameError, normalizeCategoryName } from '@/lib/category-name'
 
 // PUT /api/categories/[id] - Update category
 export async function PUT(
@@ -10,10 +11,16 @@ export async function PUT(
     const params = await context.params
     const id = parseInt(params.id)
     const body = await request.json()
-    const { name, type, icon, color, isActive } = body
+    const { type, icon, color, isActive } = body
+    const name = normalizeCategoryName(body.name)
 
     // Validation
-    if (!name || !type) {
+    const nameError = categoryNameError(name)
+    if (nameError) {
+      return NextResponse.json({ error: nameError }, { status: 400 })
+    }
+
+    if (!type) {
       return NextResponse.json(
         { error: 'Name and type are required' },
         { status: 400 }
