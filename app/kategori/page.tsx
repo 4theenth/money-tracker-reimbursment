@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useNotification } from '@/contexts/NotificationContext'
+import { CATEGORY_NAME_MAX_LENGTH } from '@/lib/category-name'
 import { emojiOptions } from '@/lib/config/emojis'
 
 interface Category {
@@ -327,27 +328,19 @@ export default function KategoriPage() {
   const expenseCategories = categories.filter(c => c.type === 'expense')
 
   return (
-    <div className="min-h-screen bg-paper p-4 md:p-8">
+    <div className="p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div>
-            <div className="flex items-center gap-3">
-              <Link
-                href="/"
-                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-              >
-                ← Kembali
-              </Link>
-            </div>
-            <h1 className="text-3xl font-bold text-gray-800 dark:text-white mt-2">
+            <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
               🏷️ Kelola Kategori
             </h1>
             <p className="text-gray-600 dark:text-gray-300 mt-1">
               Tambah, edit, atau nonaktifkan kategori transaksi
             </p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-3">
             <Link
               href="/admin/emoji-manager"
               className="bg-brand-secondary hover:bg-brand-secondary-hover text-white px-6 py-3 rounded-lg font-semibold shadow-sm transition-colors"
@@ -420,9 +413,11 @@ export default function KategoriPage() {
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       required
+                      maxLength={CATEGORY_NAME_MAX_LENGTH}
                       placeholder="Contoh: ATK Kantor"
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent dark:bg-gray-700 dark:text-white"
                     />
+                    <p className="mt-1 text-right text-xs text-ink-muted">{formData.name.length}/{CATEGORY_NAME_MAX_LENGTH}</p>
                   </div>
 
                   {/* Type */}
@@ -509,9 +504,9 @@ export default function KategoriPage() {
                   {/* Preview */}
                   <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
                     <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Preview:</p>
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <span className="text-2xl">{formData.icon}</span>
-                      <span className="font-semibold text-gray-800 dark:text-white flex items-center gap-2 min-w-0">
+                      <span className="font-semibold text-gray-800 dark:text-white flex items-center gap-2 min-w-0 [overflow-wrap:anywhere]">
                         <span aria-hidden="true" className="inline-block w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: formData.color }} />
                         {formData.name || 'Nama Kategori'}
                       </span>
@@ -569,17 +564,17 @@ export default function KategoriPage() {
                 {incomeCategories.map((category) => (
                   <div
                     key={category.id}
-                    className={`flex items-center justify-between p-3 rounded-lg ${
+                    className={`flex flex-wrap items-center justify-between gap-2 p-3 rounded-lg ${
                       category.isActive
                         ? 'bg-gray-50 dark:bg-gray-700'
                         : 'bg-gray-100 dark:bg-gray-700 opacity-60'
                     }`}
                   >
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl">{category.icon}</span>
-                      <div>
+                    <div className="flex items-center gap-3 flex-1 min-w-[10rem]">
+                      <span className="text-2xl shrink-0">{category.icon}</span>
+                      <div className="min-w-0">
                         <p
-                          className="font-semibold text-gray-800 dark:text-white flex items-center gap-2"
+                          className="font-semibold text-gray-800 dark:text-white flex items-center gap-2 [overflow-wrap:anywhere]"
                         >
                           <span aria-hidden="true" className="inline-block w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: category.color || '#6b7280' }} />
                           {category.name}
@@ -636,17 +631,17 @@ export default function KategoriPage() {
                 {expenseCategories.map((category) => (
                   <div
                     key={category.id}
-                    className={`flex items-center justify-between p-3 rounded-lg ${
+                    className={`flex flex-wrap items-center justify-between gap-2 p-3 rounded-lg ${
                       category.isActive
                         ? 'bg-gray-50 dark:bg-gray-700'
                         : 'bg-gray-100 dark:bg-gray-700 opacity-60'
                     }`}
                   >
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl">{category.icon}</span>
-                      <div>
+                    <div className="flex items-center gap-3 flex-1 min-w-[10rem]">
+                      <span className="text-2xl shrink-0">{category.icon}</span>
+                      <div className="min-w-0">
                         <p
-                          className="font-semibold text-gray-800 dark:text-white flex items-center gap-2"
+                          className="font-semibold text-gray-800 dark:text-white flex items-center gap-2 [overflow-wrap:anywhere]"
                         >
                           <span aria-hidden="true" className="inline-block w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: category.color || '#6b7280' }} />
                           {category.name}
@@ -686,7 +681,7 @@ export default function KategoriPage() {
         {/* Reimbursement Categories Section */}
         <div className="mt-8">
           <div className="mb-6">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
                 <h2 className="text-2xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
                   <span className="text-3xl">📂</span>
@@ -731,16 +726,16 @@ export default function KategoriPage() {
                 {reimbursementCategories.map((category) => (
                   <div
                     key={category.id}
-                    className={`flex items-center justify-between p-4 rounded-lg border-2 transition-all ${
+                    className={`flex flex-col gap-3 min-w-0 p-4 rounded-lg border-2 transition-all ${
                       category.isActive
                         ? 'bg-brand-secondary/10 dark:bg-brand-secondary/20 border-brand-secondary/50'
                         : 'bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 opacity-60'
                     }`}
                   >
-                    <div className="flex items-center gap-3">
-                      <span className="text-3xl">{category.icon}</span>
-                      <div>
-                        <p className="font-semibold text-gray-800 dark:text-white">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span className="text-3xl shrink-0">{category.icon}</span>
+                      <div className="min-w-0">
+                        <p className="font-semibold text-gray-800 dark:text-white [overflow-wrap:anywhere]">
                           {category.name}
                         </p>
                         {!category.isActive && (
@@ -750,12 +745,12 @@ export default function KategoriPage() {
                         )}
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-3 mt-auto">
                       <button
                         onClick={() => handleReimbEdit(category)}
                         className="text-accent hover:text-accent-hover text-sm font-medium"
                       >
-                        ✏️
+                        Edit
                       </button>
                       <button
                         onClick={() => handleReimbToggle(category)}
@@ -764,9 +759,8 @@ export default function KategoriPage() {
                             ? 'text-status-danger hover:text-status-danger'
                             : 'text-status-success hover:text-status-success'
                         }`}
-                        title={category.isActive ? 'Nonaktifkan' : 'Aktifkan'}
                       >
-                        {category.isActive ? '🗑️' : '✅'}
+                        {category.isActive ? 'Nonaktifkan' : 'Aktifkan'}
                       </button>
                     </div>
                   </div>
@@ -809,9 +803,11 @@ export default function KategoriPage() {
                       value={reimbFormData.name}
                       onChange={(e) => setReimbFormData({ ...reimbFormData, name: e.target.value })}
                       required
+                      maxLength={CATEGORY_NAME_MAX_LENGTH}
                       placeholder="Contoh: Makan & Minum"
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent dark:bg-gray-700 dark:text-white"
                     />
+                    <p className="mt-1 text-right text-xs text-ink-muted">{reimbFormData.name.length}/{CATEGORY_NAME_MAX_LENGTH}</p>
                   </div>
 
                   {/* Icon Picker */}

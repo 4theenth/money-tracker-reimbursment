@@ -1,7 +1,9 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 :root {
-  color-scheme: light dark;
+  color-scheme: light;
   --background: #f4f6f3;
   --foreground: #1b2a33;
 
@@ -10,8 +12,8 @@
   --color-surface: #ffffff;
   --color-ink: #1b2a33;
   --color-ink-muted: #55656e;
-  --color-accent: #1d4f6e;
-  --color-accent-hover: #163e57;
+  --color-accent: #2b6385;
+  --color-accent-hover: #235270;
   --color-income: #1a6e42;
   --color-expense: #b3362b;
   --color-caution: #8f5b00;
@@ -25,14 +27,14 @@
   --color-caution-solid-hover: #764b00;
 
   /* Brand Colors: solid fills that carry white text */
-  --color-brand-primary: #1d4f6e;
-  --color-brand-primary-hover: #163e57;
-  --color-brand-secondary: #1d4f6e;
-  --color-brand-secondary-hover: #163e57;
+  --color-brand-primary: #2b6385;
+  --color-brand-primary-hover: #235270;
+  --color-brand-secondary: #2b6385;
+  --color-brand-secondary-hover: #235270;
 
   /* Action Colors: solid fills that carry white text, in both themes */
-  --color-action-save: #1d4f6e;
-  --color-action-save-hover: #163e57;
+  --color-action-save: #2b6385;
+  --color-action-save-hover: #235270;
   --color-action-delete: #b3362b;
   --color-action-delete-hover: #962b22;
   --color-action-edit: #8f5b00;
@@ -47,8 +49,13 @@
   --color-status-danger-light: #f7e1de;
   --color-status-warning: #8f5b00;
   --color-status-warning-light: #f6ebd3;
-  --color-status-info: #1d4f6e;
+  --color-status-info: #2b6385;
   --color-status-info-light: #dde9f0;
+
+  /* Hairlines and chart marks */
+  --chart-income: #2b6385;
+  --chart-expense: #7d8d96;
+  --line: #d8dfdd;
 
   /* Neutral Colors - Light Mode */
   --color-neutral-50: #f4f6f3;
@@ -141,50 +148,54 @@
   --color-neutral-900: var(--color-neutral-900);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #141e24;
-    --foreground: #e6ecea;
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --background: #141e24;
+  --foreground: #e6ecea;
 
-    /* Page Palette */
-    --color-paper: #141e24;
-    --color-surface: #1c2830;
-    --color-ink: #e6ecea;
-    --color-ink-muted: #a3b1b8;
-    --color-accent: #7fb6d9;
-    --color-accent-hover: #a5cce6;
-    --color-income: #5cc48e;
-    --color-expense: #f0877b;
-    --color-caution: #e0a93f;
+  /* Page Palette */
+  --color-paper: #141e24;
+  --color-surface: #1c2830;
+  --color-ink: #e6ecea;
+  --color-ink-muted: #a3b1b8;
+  --color-accent: #8fbcd8;
+  --color-accent-hover: #aacfe6;
+  --color-income: #5cc48e;
+  --color-expense: #f0877b;
+  --color-caution: #e0a93f;
 
-    /* Brand fills stay dark enough for white text */
-    --color-brand-primary: #2f6f96;
-    --color-brand-primary-hover: #285f82;
-    --color-brand-secondary: #2f6f96;
-    --color-brand-secondary-hover: #285f82;
+  /* Brand fills stay dark enough for white text */
+  --color-brand-primary: #2f6789;
+  --color-brand-primary-hover: #285a78;
+  --color-brand-secondary: #2f6789;
+  --color-brand-secondary-hover: #285a78;
 
-    /* Status colors - brighter so they stay readable as text */
-    --color-status-success: #5cc48e;
-    --color-status-success-light: #143b2a;
-    --color-status-danger: #f0877b;
-    --color-status-danger-light: #4a211d;
-    --color-status-warning: #e0a93f;
-    --color-status-warning-light: #44330f;
-    --color-status-info: #7fb6d9;
-    --color-status-info-light: #1b3a4e;
+  /* Status colors - brighter so they stay readable as text */
+  --color-status-success: #5cc48e;
+  --color-status-success-light: #143b2a;
+  --color-status-danger: #f0877b;
+  --color-status-danger-light: #4a211d;
+  --color-status-warning: #e0a93f;
+  --color-status-warning-light: #44330f;
+  --color-status-info: #8fbcd8;
+  --color-status-info-light: #1b3a4e;
 
-    /* Neutral Colors - Dark Mode (inverted) */
-    --color-neutral-50: #141e24;
-    --color-neutral-100: #1c2830;
-    --color-neutral-200: #2a3842;
-    --color-neutral-300: #485860;
-    --color-neutral-400: #5f6f78;
-    --color-neutral-500: #8e9da5;
-    --color-neutral-600: #bfcac9;
-    --color-neutral-700: #d8dfdd;
-    --color-neutral-800: #e9edea;
-    --color-neutral-900: #f4f6f3;
-  }
+  /* Hairlines and chart marks */
+  --chart-income: #6a9abb;
+  --chart-expense: #5a6a73;
+  --line: #2a3842;
+
+  /* Neutral Colors - Dark Mode (inverted) */
+  --color-neutral-50: #141e24;
+  --color-neutral-100: #1c2830;
+  --color-neutral-200: #2a3842;
+  --color-neutral-300: #485860;
+  --color-neutral-400: #5f6f78;
+  --color-neutral-500: #8e9da5;
+  --color-neutral-600: #bfcac9;
+  --color-neutral-700: #d8dfdd;
+  --color-neutral-800: #e9edea;
+  --color-neutral-900: #f4f6f3;
 }
 
 body {
@@ -201,6 +212,10 @@ select:focus-visible,
 textarea:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
+}
+
+.on-brand a:focus-visible {
+  outline-color: #ffffff;
 }
 
 @media (prefers-reduced-motion: reduce) {

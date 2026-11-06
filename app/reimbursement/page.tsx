@@ -290,20 +290,12 @@ export default function ReimbursementPage() {
   const paidReimbursements = reimbursements.filter(r => r.status === 'paid')
 
   return (
-    <div className="min-h-screen bg-paper p-4 md:p-8">
+    <div className="p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         
         {/* Header */}
         <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 mb-6">
           <div>
-            <div className="flex items-center gap-3 mb-2">
-              <Link
-                href="/"
-                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-              >
-                ← Kembali
-              </Link>
-            </div>
             <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
               🏢 Reimbursement Kantor
             </h1>
@@ -431,7 +423,7 @@ export default function ReimbursementPage() {
                 >
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-2xl">{data.icon || '📦'}</span>
-                    <span className="font-semibold text-gray-800 dark:text-white text-sm">
+                    <span className="font-semibold text-gray-800 dark:text-white text-sm min-w-0 [overflow-wrap:anywhere]">
                       {name}
                     </span>
                   </div>
@@ -478,14 +470,14 @@ export default function ReimbursementPage() {
                 >
                   <div className="flex items-start justify-between gap-4">
                     {/* Left: Details */}
-                    <div className="flex-1">
+                    <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-2">
                         <span className="text-2xl">{reimb.officeCategory.icon || '📦'}</span>
-                        <div>
-                          <p className="font-semibold text-gray-800 dark:text-white">
+                        <div className="min-w-0">
+                          <p className="font-semibold text-gray-800 dark:text-white [overflow-wrap:anywhere]">
                             {reimb.transaction.description}
                           </p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                          <p className="text-xs text-gray-500 dark:text-gray-400 [overflow-wrap:anywhere]">
                             {reimb.officeCategory.name} • {formatDate(reimb.transaction.date)}
                           </p>
                         </div>

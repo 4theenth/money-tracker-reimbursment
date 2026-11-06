@@ -82,7 +82,7 @@ export default function TabunganPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-paper flex items-center justify-center">
+      <div className="min-h-[60vh] flex items-center justify-center">
         <div className="text-center">
           <div className="text-6xl mb-4">💎</div>
           <p className="text-gray-600 dark:text-gray-300">Loading...</p>
@@ -92,16 +92,10 @@ export default function TabunganPage() {
   }
 
   return (
-    <div className="min-h-screen bg-paper p-4 md:p-8">
+    <div className="p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-6">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 text-accent hover:text-accent-hover font-medium mb-4 transition-colors"
-          >
-            ← Kembali ke Dashboard
-          </Link>
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-800 dark:text-white">

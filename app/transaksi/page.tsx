@@ -252,16 +252,10 @@ export default function TransaksiPage() {
   const isReimbursementCategory = selectedCategory?.name === 'Reimbursement Kantor'
 
   return (
-    <div className="min-h-screen bg-paper p-4 md:p-8">
+    <div className="p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-6">
-          <a
-            href="/"
-            className="inline-flex items-center gap-2 text-accent hover:text-accent-hover font-medium mb-4 transition-colors"
-          >
-            ← Kembali ke Dashboard
-          </a>
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-800 dark:text-white">💰 Transaksi</h1>
