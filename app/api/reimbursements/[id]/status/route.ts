@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { setReimbursementStatus } from '@/lib/reimbursements'
 
 // PATCH /api/reimbursements/:id/status - Update status reimbursement
 export async function PATCH(
@@ -20,22 +20,7 @@ export async function PATCH(
       )
     }
 
-    // Update reimbursement status
-    const reimbursement = await prisma.reimbursement.update({
-      where: { id },
-      data: {
-        status,
-        paidDate: status === 'paid' ? new Date() : null
-      },
-      include: {
-        transaction: {
-          include: {
-            category: true
-          }
-        },
-        officeCategory: true
-      }
-    })
+    const reimbursement = await setReimbursementStatus(id, status)
 
     return NextResponse.json({
       success: true,

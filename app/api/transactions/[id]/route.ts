@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { deleteTransactionWithLinks, recalculateBalances } from '@/lib/reimbursements'
 
 interface RouteContext {
   params: Promise<{ id: string }> | { id: string }
@@ -43,19 +44,55 @@ export async function PUT(
     const params = await Promise.resolve(context.params)
     const body = await request.json()
     const { date, categoryId, description, income, expense, isSaving, savingsLocation } = body
+    const id = parseInt(params.id)
 
-    const transaction = await prisma.transaction.update({
-      where: { id: parseInt(params.id) },
-      data: {
-        date: date ? new Date(date) : undefined,
-        categoryId: categoryId ? parseInt(categoryId) : undefined,
-        description,
-        income: income !== undefined ? income : undefined,
-        expense: expense !== undefined ? expense : undefined,
-        isSaving,
-        savingsLocation: savingsLocation !== undefined ? savingsLocation : undefined,
-      },
-      include: { category: true },
+    const existing = await prisma.transaction.findUnique({
+      where: { id },
+      include: { reimbursement: true, reimbursementPayment: true },
+    })
+
+    // A claim's payment always equals the claim, so only its date, account and note can change
+    if (existing?.reimbursementPayment) {
+      const changesAmount = income !== undefined && income !== existing.income
+      const changesCategory = categoryId !== undefined && parseInt(categoryId) !== existing.categoryId
+      if (changesAmount || changesCategory) {
+        return NextResponse.json(
+          { error: 'Jumlah dan kategori penggantian mengikuti klaim reimbursement. Ubah statusnya di halaman Reimbursement.' },
+          { status: 400 }
+        )
+      }
+    }
+
+    const transaction = await prisma.$transaction(async (tx) => {
+      const updated = await tx.transaction.update({
+        where: { id },
+        data: {
+          date: date ? new Date(date) : undefined,
+          categoryId: categoryId ? parseInt(categoryId) : undefined,
+          description,
+          income: income !== undefined ? income : undefined,
+          expense: expense !== undefined ? expense : undefined,
+          isSaving,
+          savingsLocation: savingsLocation !== undefined ? savingsLocation : undefined,
+        },
+        include: { category: true },
+      })
+
+      if (existing?.reimbursementPayment && date) {
+        await tx.reimbursement.update({
+          where: { id: existing.reimbursementPayment.id },
+          data: { paidDate: updated.date },
+        })
+      }
+
+      if (existing?.reimbursement?.paymentTransactionId && expense !== undefined) {
+        await tx.transaction.update({
+          where: { id: existing.reimbursement.paymentTransactionId },
+          data: { income: expense },
+        })
+      }
+
+      return updated
     })
 
     // Recalculate all balances
@@ -78,12 +115,7 @@ export async function DELETE(
 ) {
   try {
     const params = await Promise.resolve(context.params)
-    await prisma.transaction.delete({
-      where: { id: parseInt(params.id) },
-    })
-
-    // Recalculate all balances
-    await recalculateBalances()
+    await deleteTransactionWithLinks(parseInt(params.id))
 
     return NextResponse.json({ success: true })
   } catch (error) {
@@ -92,21 +124,5 @@ export async function DELETE(
       { error: 'Failed to delete transaction' },
       { status: 500 }
     )
-  }
-}
-
-// Helper function to recalculate all balances
-async function recalculateBalances() {
-  const transactions = await prisma.transaction.findMany({
-    orderBy: { date: 'asc' },
-  })
-
-  let balance = 0
-  for (const transaction of transactions) {
-    balance = balance + transaction.income - transaction.expense
-    await prisma.transaction.update({
-      where: { id: transaction.id },
-      data: { balance },
-    })
   }
 }

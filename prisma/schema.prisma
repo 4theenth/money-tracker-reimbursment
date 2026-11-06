@@ -66,7 +66,8 @@ model Transaction {
   updatedAt   DateTime @updatedAt
 
   category      Category @relation(fields: [categoryId], references: [id])
-  reimbursement Reimbursement?
+  reimbursement Reimbursement? @relation("ReimbursementExpense")
+  reimbursementPayment Reimbursement? @relation("ReimbursementPayment")
 
   @@index([date])
   @@index([categoryId])
@@ -85,10 +86,12 @@ model Reimbursement {
   notes           String?
   status          String   @default("pending") // "pending", "paid"
   paidDate        DateTime? // Date when marked as paid
+  paymentTransactionId Int? @unique // Income transaction recorded when the office pays this claim
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-  transaction     Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  transaction     Transaction @relation("ReimbursementExpense", fields: [transactionId], references: [id], onDelete: Cascade)
+  paymentTransaction Transaction? @relation("ReimbursementPayment", fields: [paymentTransactionId], references: [id], onDelete: SetNull)
   officeCategory  ReimbursementCategory @relation(fields: [officeCategoryId], references: [id])
 
   @@index([status])
