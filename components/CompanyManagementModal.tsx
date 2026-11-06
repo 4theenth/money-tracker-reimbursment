@@ -102,7 +102,7 @@ export default function CompanyManagementModal({ isOpen, onClose }: Props) {
           {/* Add Button */}
           <button
             onClick={() => setIsAddModalOpen(true)}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg font-semibold transition-colors"
+            className="w-full bg-brand-primary hover:bg-brand-primary-hover text-white px-4 py-3 rounded-lg font-semibold transition-colors"
           >
             ➕ Tambah Perusahaan Baru
           </button>
@@ -110,12 +110,12 @@ export default function CompanyManagementModal({ isOpen, onClose }: Props) {
           {/* Company List */}
           {loading ? (
             <div className="text-center py-8">
-              <p className="text-gray-500">Loading...</p>
+              <p className="text-gray-500 dark:text-gray-400">Loading...</p>
             </div>
           ) : companies.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-gray-500">Belum ada perusahaan tersimpan</p>
-              <p className="text-sm text-gray-400 mt-2">Klik tombol di atas untuk menambah</p>
+              <p className="text-gray-500 dark:text-gray-400">Belum ada perusahaan tersimpan</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">Klik tombol di atas untuk menambah</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -124,7 +124,7 @@ export default function CompanyManagementModal({ isOpen, onClose }: Props) {
                   key={company.id}
                   className={`border rounded-lg p-4 ${
                     company.isDefault
-                      ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
+                      ? 'border-accent bg-status-info-light bg-status-info-light'
                       : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700'
                   }`}
                 >
@@ -138,7 +138,7 @@ export default function CompanyManagementModal({ isOpen, onClose }: Props) {
                           className="h-12 w-12 object-contain rounded"
                         />
                       ) : (
-                        <div className="h-12 w-12 bg-gray-200 dark:bg-gray-600 rounded flex items-center justify-center text-gray-400">
+                        <div className="h-12 w-12 bg-gray-200 dark:bg-gray-600 rounded flex items-center justify-center text-gray-500 dark:text-gray-400">
                           🏢
                         </div>
                       )}
@@ -147,10 +147,10 @@ export default function CompanyManagementModal({ isOpen, onClose }: Props) {
                         <p className="font-semibold text-gray-800 dark:text-white">
                           {company.name}
                           {company.isDefault && (
-                            <span className="ml-2 text-yellow-500">⭐</span>
+                            <span className="ml-2 text-caution">⭐</span>
                           )}
                         </p>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
                           {new Date(company.createdAt).toLocaleDateString('id-ID')}
                         </p>
                       </div>
@@ -161,7 +161,7 @@ export default function CompanyManagementModal({ isOpen, onClose }: Props) {
                       {!company.isDefault && (
                         <button
                           onClick={() => handleSetDefault(company.id)}
-                          className="text-xs bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded"
+                          className="text-xs bg-caution-solid hover:bg-caution-solid-hover text-white px-3 py-1 rounded"
                           title="Jadikan default"
                         >
                           ⭐ Set Default
@@ -169,7 +169,7 @@ export default function CompanyManagementModal({ isOpen, onClose }: Props) {
                       )}
                       <button
                         onClick={() => handleDelete(company.id, company.name)}
-                        className="text-xs bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
+                        className="text-xs bg-expense-solid hover:bg-expense-solid-hover text-white px-3 py-1 rounded"
                         title="Hapus"
                       >
                         🗑️ Hapus

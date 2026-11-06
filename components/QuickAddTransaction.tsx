@@ -162,9 +162,9 @@ export default function QuickAddTransaction({ onSuccess }: QuickAddProps) {
       {/* Floating Button */}
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-2xl hover:shadow-blue-500/50 transition-all z-50 flex items-center gap-2"
+        className="fixed bottom-6 right-6 bg-brand-primary hover:bg-brand-primary-hover text-white p-4 rounded-full shadow-2xl transition-all z-50 flex items-center gap-2"
       >
-        <span className="text-2xl">➕</span>
+        <span aria-hidden="true" className="text-2xl leading-none">+</span>
         <span className="font-semibold pr-2">Tambah Cepat</span>
       </button>
 
@@ -172,7 +172,7 @@ export default function QuickAddTransaction({ onSuccess }: QuickAddProps) {
       <Modal
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
-        title="➕ Tambah Transaksi Cepat"
+        title="Tambah transaksi cepat"
         maxWidth="md"
       >
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -190,7 +190,7 @@ export default function QuickAddTransaction({ onSuccess }: QuickAddProps) {
                     value={formData.date}
                     onChange={(e) => setFormData({ ...formData, date: e.target.value })}
                     required
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent dark:bg-gray-700 dark:text-white"
                   />
                 </div>
 
@@ -205,7 +205,7 @@ export default function QuickAddTransaction({ onSuccess }: QuickAddProps) {
                       onClick={() => setFormData({ ...formData, type: 'income', categoryId: '' })}
                       className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                         formData.type === 'income'
-                          ? 'bg-green-600 text-white'
+                          ? 'bg-income-solid text-white'
                           : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
                       }`}
                     >
@@ -216,7 +216,7 @@ export default function QuickAddTransaction({ onSuccess }: QuickAddProps) {
                       onClick={() => setFormData({ ...formData, type: 'expense', categoryId: '' })}
                       className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                         formData.type === 'expense'
-                          ? 'bg-red-600 text-white'
+                          ? 'bg-expense-solid text-white'
                           : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
                       }`}
                     >
@@ -234,7 +234,7 @@ export default function QuickAddTransaction({ onSuccess }: QuickAddProps) {
                     value={formData.categoryId}
                     onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
                     required
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent dark:bg-gray-700 dark:text-white"
                   >
                     <option value="">Pilih Kategori</option>
                     {currentCategories.map((cat) => (
@@ -264,7 +264,7 @@ export default function QuickAddTransaction({ onSuccess }: QuickAddProps) {
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     required
                     rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent dark:bg-gray-700 dark:text-white"
                     placeholder="Contoh: Gaji bulan Oktober"
                   />
                 </div>
@@ -281,7 +281,7 @@ export default function QuickAddTransaction({ onSuccess }: QuickAddProps) {
                     required
                     min="0"
                     step="0.01"
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent dark:bg-gray-700 dark:text-white"
                     placeholder="0"
                   />
                 </div>
@@ -312,7 +312,7 @@ export default function QuickAddTransaction({ onSuccess }: QuickAddProps) {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50"
+                    className="flex-1 px-4 py-2 bg-brand-primary text-white rounded-lg font-medium hover:bg-brand-primary-hover disabled:opacity-50"
                   >
                     {loading ? 'Menyimpan...' : 'Simpan'}
                   </button>

@@ -113,8 +113,8 @@ export default function ReimbursementPage() {
     confirm({
       title: isPaid ? 'Tandai Belum Dibayar' : 'Tandai Sudah Dibayar',
       message: isPaid 
-        ? `Tandai reimbursement "${reimbursement.transaction.description}" sebagai belum dibayar?`
-        : `Tandai reimbursement "${reimbursement.transaction.description}" sebagai sudah dibayar?`,
+        ? `Tandai "${reimbursement.transaction.description}" sebagai belum dibayar? Pemasukan penggantiannya akan dihapus dari transaksi.`
+        : `Tandai "${reimbursement.transaction.description}" sebagai sudah dibayar? Pemasukan ${formatCurrency(reimbursement.transaction.expense)} akan dicatat otomatis ke transaksi.`,
       confirmLabel: isPaid ? 'Ya, Belum Dibayar' : 'Ya, Sudah Dibayar',
       cancelLabel: 'Batal',
       confirmVariant: isPaid ? 'primary' : 'success',
@@ -131,7 +131,7 @@ export default function ReimbursementPage() {
             return
           }
 
-          showSuccess(isPaid ? 'Status diubah menjadi belum dibayar' : 'Status berhasil diupdate sebagai dibayar!')
+          showSuccess(isPaid ? 'Status belum dibayar, pemasukan penggantian dihapus' : 'Sudah dibayar, pemasukan penggantian dicatat')
           fetchReimbursements()
         } catch (error) {
           console.error('Error updating status:', error)
@@ -144,7 +144,7 @@ export default function ReimbursementPage() {
   const handleDelete = (reimbursement: Reimbursement) => {
     confirm({
       title: 'Hapus Reimbursement',
-      message: `Yakin ingin menghapus reimbursement "${reimbursement.transaction.description}"? Transaksi tetap ada, hanya data reimbursement yang dihapus.`,
+      message: `Yakin ingin menghapus reimbursement "${reimbursement.transaction.description}"? Pengeluarannya tetap ada di transaksi${reimbursement.status === 'paid' ? ', tetapi pemasukan penggantiannya ikut dihapus' : ''}.`,
       confirmLabel: 'Hapus',
       cancelLabel: 'Batal',
       confirmVariant: 'danger',
@@ -269,8 +269,8 @@ export default function ReimbursementPage() {
     .filter(r => r.status === 'pending')
     .reduce((sum, r) => sum + r.transaction.expense, 0)
 
-  const totalClaimed = reimbursements
-    .filter(r => r.status === 'claimed')
+  const totalPaid = reimbursements
+    .filter(r => r.status === 'paid')
     .reduce((sum, r) => sum + r.transaction.expense, 0)
 
   const totalAll = reimbursements.reduce((sum, r) => sum + r.transaction.expense, 0)
@@ -287,14 +287,14 @@ export default function ReimbursementPage() {
   }, {} as Record<string, { total: number; count: number; icon: string | null }>)
 
   const pendingReimbursements = reimbursements.filter(r => r.status === 'pending')
-  const claimedReimbursements = reimbursements.filter(r => r.status === 'claimed')
+  const paidReimbursements = reimbursements.filter(r => r.status === 'paid')
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4 md:p-8">
+    <div className="min-h-screen bg-paper p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 mb-6">
           <div>
             <div className="flex items-center gap-3 mb-2">
               <Link
@@ -312,28 +312,28 @@ export default function ReimbursementPage() {
             </p>
           </div>
           
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <button
               onClick={() => setIsFormOpen(true)}
-              className="bg-brand-primary hover:bg-brand-primary-hover text-white px-6 py-3 rounded-lg font-semibold shadow-lg transition-colors"
+              className="bg-brand-primary hover:bg-brand-primary-hover text-white px-6 py-3 rounded-lg font-semibold shadow-sm transition-colors"
             >
               ➕ Tambah Reimbursement
             </button>
             <button
               onClick={() => setIsCompanyModalOpen(true)}
-              className="bg-brand-secondary hover:bg-brand-secondary-hover text-white px-6 py-3 rounded-lg font-semibold shadow-lg transition-colors"
+              className="bg-brand-secondary hover:bg-brand-secondary-hover text-white px-6 py-3 rounded-lg font-semibold shadow-sm transition-colors"
             >
               🏢 Kelola Perusahaan
             </button>
             <Link
               href="/kategori"
-              className="bg-brand-secondary hover:bg-brand-secondary-hover text-white px-6 py-3 rounded-lg font-semibold shadow-lg transition-colors text-center"
+              className="bg-brand-secondary hover:bg-brand-secondary-hover text-white px-6 py-3 rounded-lg font-semibold shadow-sm transition-colors text-center"
             >
               📂 Kelola Kategori
             </Link>
             <button
               onClick={() => setIsExportModalOpen(true)}
-              className="bg-action-save hover:bg-action-save-hover text-white px-6 py-3 rounded-lg font-semibold shadow-lg transition-colors"
+              className="bg-action-save hover:bg-action-save-hover text-white px-6 py-3 rounded-lg font-semibold shadow-sm transition-colors"
             >
               📄 Export Laporan
             </button>
@@ -341,7 +341,7 @@ export default function ReimbursementPage() {
         </div>
 
         {/* Filters */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 mb-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             
             {/* Date Range Picker (replaces Month & Year) */}
@@ -366,11 +366,11 @@ export default function ReimbursementPage() {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent dark:bg-gray-700 dark:text-white"
               >
                 <option value="">Semua Status</option>
                 <option value="pending">Menunggu Dibayar</option>
-                <option value="claimed">Sudah Dibayar</option>
+                <option value="paid">Sudah Dibayar</option>
               </select>
             </div>
           </div>
@@ -378,29 +378,29 @@ export default function ReimbursementPage() {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="bg-gradient-to-br from-yellow-400 to-orange-500 rounded-lg shadow-lg p-6 text-white">
+          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm opacity-90">Menunggu Dibayar</p>
-                <p className="text-2xl font-bold mt-1">{formatCurrency(totalPending)}</p>
+                <p className="text-2xl font-bold mt-1 text-caution">{formatCurrency(totalPending)}</p>
                 <p className="text-xs opacity-75 mt-1">{pendingReimbursements.length} item</p>
               </div>
               <div className="text-4xl">⏳</div>
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-green-400 to-emerald-500 rounded-lg shadow-lg p-6 text-white">
+          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm opacity-90">Sudah Dibayar</p>
-                <p className="text-2xl font-bold mt-1">{formatCurrency(totalClaimed)}</p>
-                <p className="text-xs opacity-75 mt-1">{claimedReimbursements.length} item</p>
+                <p className="text-2xl font-bold mt-1 text-income">{formatCurrency(totalPaid)}</p>
+                <p className="text-xs opacity-75 mt-1">{paidReimbursements.length} item</p>
               </div>
               <div className="text-4xl">✅</div>
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-purple-400 to-indigo-500 rounded-lg shadow-lg p-6 text-white">
+          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm opacity-90">Total Periode</p>
@@ -415,13 +415,13 @@ export default function ReimbursementPage() {
         {/* Will continue with breakdown and list in next part */}
 
         {/* Breakdown by Category */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
           <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-4">
             📊 Breakdown per Kategori
           </h2>
           
           {Object.keys(byCategory).length === 0 ? (
-            <p className="text-center text-gray-500 py-8">Belum ada data</p>
+            <p className="text-center text-gray-500 dark:text-gray-400 py-8">Belum ada data</p>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {Object.entries(byCategory).map(([name, data]) => (
@@ -435,7 +435,7 @@ export default function ReimbursementPage() {
                       {name}
                     </span>
                   </div>
-                  <p className="text-lg font-bold text-brand-secondary">
+                  <p className="text-lg font-bold text-accent">
                     {formatCurrency(data.total)}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
@@ -448,20 +448,20 @@ export default function ReimbursementPage() {
         </div>
 
         {/* Reimbursement List */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
           <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-4">
             📋 Daftar Reimbursement
           </h2>
 
           {loading ? (
-            <p className="text-center py-8 text-gray-500">Loading...</p>
+            <p className="text-center py-8 text-gray-500 dark:text-gray-400">Loading...</p>
           ) : reimbursements.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-6xl mb-4">📭</p>
               <p className="text-gray-500 dark:text-gray-400">
                 Belum ada reimbursement untuk periode ini
               </p>
-              <p className="text-sm text-gray-400 dark:text-gray-500 mt-2">
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
                 Buat transaksi dengan kategori "Reimbursement Kantor" untuk mulai tracking
               </p>
             </div>
@@ -503,7 +503,7 @@ export default function ReimbursementPage() {
                             href={reimb.receiptPhoto}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-sm text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-1"
+                            className="text-sm text-accent hover:underline inline-flex items-center gap-1"
                           >
                             📎 Lihat Bukti Nota
                           </a>
@@ -513,18 +513,18 @@ export default function ReimbursementPage() {
 
                     {/* Right: Amount & Actions */}
                     <div className="text-right">
-                      <p className="text-xl font-bold text-purple-600 dark:text-purple-400 mb-2">
+                      <p className="text-xl font-bold text-accent mb-2">
                         {formatCurrency(reimb.transaction.expense)}
                       </p>
                       
                       <div className="flex items-center gap-2 mb-2">
                         {reimb.status === 'pending' ? (
-                          <span className="text-xs bg-status-warning text-white px-2 py-1 rounded">
+                          <span className="text-xs bg-caution-solid text-white px-2 py-1 rounded">
                             🔴 Belum Lunas
                           </span>
                         ) : (
                           <>
-                            <span className="text-xs bg-status-success text-white px-2 py-1 rounded">
+                            <span className="text-xs bg-income-solid text-white px-2 py-1 rounded">
                               ✅ Lunas
                             </span>
                             {reimb.paidDate && (
@@ -599,7 +599,7 @@ export default function ReimbursementPage() {
                     type="date"
                     value={formData.date}
                     onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent dark:bg-gray-700 dark:text-white"
                     required
                   />
                 </div>
@@ -612,7 +612,7 @@ export default function ReimbursementPage() {
                   <select
                     value={formData.officeCategoryId}
                     onChange={(e) => setFormData({ ...formData, officeCategoryId: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent dark:bg-gray-700 dark:text-white"
                     required
                   >
                     <option value="">Pilih Kategori...</option>
@@ -634,7 +634,7 @@ export default function ReimbursementPage() {
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     placeholder="Contoh: Pembelian ATK untuk meeting"
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent dark:bg-gray-700 dark:text-white"
                     required
                   />
                 </div>
@@ -651,7 +651,7 @@ export default function ReimbursementPage() {
                     placeholder="0"
                     min="0"
                     step="1000"
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent dark:bg-gray-700 dark:text-white"
                     required
                   />
                 </div>
@@ -678,7 +678,7 @@ export default function ReimbursementPage() {
                     onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                     placeholder="Catatan tambahan..."
                     rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent dark:bg-gray-700 dark:text-white"
                   />
                 </div>
 

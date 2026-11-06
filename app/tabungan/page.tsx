@@ -82,7 +82,7 @@ export default function TabunganPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
+      <div className="min-h-screen bg-paper flex items-center justify-center">
         <div className="text-center">
           <div className="text-6xl mb-4">💎</div>
           <p className="text-gray-600 dark:text-gray-300">Loading...</p>
@@ -92,13 +92,13 @@ export default function TabunganPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4 md:p-8">
+    <div className="min-h-screen bg-paper p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-6">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-brand-primary hover:text-brand-primary-hover font-medium mb-4 transition-colors"
+            className="inline-flex items-center gap-2 text-accent hover:text-accent-hover font-medium mb-4 transition-colors"
           >
             ← Kembali ke Dashboard
           </Link>
@@ -113,7 +113,7 @@ export default function TabunganPage() {
             </div>
             <Link
               href="/transaksi"
-              className="bg-brand-primary hover:bg-brand-primary-hover text-white px-6 py-3 rounded-lg font-semibold shadow-lg transition-colors"
+              className="bg-brand-primary hover:bg-brand-primary-hover text-white px-6 py-3 rounded-lg font-semibold shadow-sm transition-colors"
             >
               + Tambah Tabungan
             </Link>
@@ -121,14 +121,14 @@ export default function TabunganPage() {
         </div>
 
         {/* Total Summary */}
-        <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg shadow-lg p-8 mb-8 text-white">
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-8 mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-purple-100 text-sm mb-2">Total Tabungan Semua Lokasi</p>
+              <p className="text-ink-muted text-sm mb-2">Total Tabungan Semua Lokasi</p>
               <p className="text-5xl font-bold mb-2">
                 {formatCurrency(totalBalance)}
               </p>
-              <p className="text-purple-100 text-sm">
+              <p className="text-ink-muted text-sm">
                 Tersebar di {breakdown.length} lokasi
               </p>
             </div>
@@ -143,17 +143,17 @@ export default function TabunganPage() {
           </h2>
           
           {breakdown.length === 0 ? (
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-12 text-center">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-12 text-center">
               <div className="text-6xl mb-4">🏦</div>
               <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">
                 Belum ada tabungan di lokasi manapun
               </p>
-              <p className="text-gray-500 dark:text-gray-500 text-sm mb-6">
+              <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">
                 Mulai menabung dengan kategori "Tabungan" dan pilih lokasi
               </p>
               <Link
                 href="/transaksi"
-                className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold"
+                className="inline-block bg-brand-primary hover:bg-brand-primary-hover text-white px-6 py-3 rounded-lg font-semibold"
               >
                 + Mulai Nabung
               </Link>
@@ -178,7 +178,7 @@ export default function TabunganPage() {
                 return (
                   <div
                     key={item.location}
-                    className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow"
+                    className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 hover:shadow-xl transition-shadow"
                   >
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1">
@@ -197,7 +197,7 @@ export default function TabunganPage() {
                     <div className="mb-3">
                       <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Saldo Saat Ini</p>
                       <p className={`text-3xl font-bold ${
-                        item.balance >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400'
+                        item.balance >= 0 ? 'text-accent' : 'text-expense'
                       }`}>
                         {formatCurrency(item.balance)}
                       </p>
@@ -221,13 +221,13 @@ export default function TabunganPage() {
             <div className="flex items-center gap-4 mb-4">
               <Link
                 href="/tabungan/buku"
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2"
+                className="px-4 py-2 bg-brand-primary hover:bg-brand-primary-hover text-white rounded-lg font-medium transition-colors flex items-center gap-2"
               >
                 📖 Lihat Buku Tabungan
               </Link>
               <Link
                 href="/transaksi"
-                className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors"
+                className="px-4 py-2 bg-income-solid hover:bg-income-solid-hover text-white rounded-lg font-medium transition-colors"
               >
                 + Tambah Tabungan
               </Link>
@@ -238,14 +238,14 @@ export default function TabunganPage() {
         {/* Summary Cards */}
         {data && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
               <div className="flex items-center justify-between mb-2">
                 <p className="text-gray-500 dark:text-gray-400 text-sm">
                   Total Setoran
                 </p>
                 <div className="text-3xl">💰</div>
               </div>
-              <p className="text-3xl font-bold text-blue-600">
+              <p className="text-3xl font-bold text-accent">
                 {formatCurrency(data.summary.total || 0)}
               </p>
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
@@ -253,14 +253,14 @@ export default function TabunganPage() {
               </p>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
               <div className="flex items-center justify-between mb-2">
                 <p className="text-gray-500 dark:text-gray-400 text-sm">
                   Jumlah Transaksi
                 </p>
                 <div className="text-3xl">📊</div>
               </div>
-              <p className="text-3xl font-bold text-green-600">
+              <p className="text-3xl font-bold text-income">
                 {data.summary.count || 0}
               </p>
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
@@ -268,14 +268,14 @@ export default function TabunganPage() {
               </p>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
               <div className="flex items-center justify-between mb-2">
                 <p className="text-gray-500 dark:text-gray-400 text-sm">
                   Rata-rata
                 </p>
                 <div className="text-3xl">📈</div>
               </div>
-              <p className="text-3xl font-bold text-purple-600">
+              <p className="text-3xl font-bold text-accent">
                 {formatCurrency(data.summary.average || 0)}
               </p>
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
@@ -287,7 +287,7 @@ export default function TabunganPage() {
 
         {/* Monthly Breakdown */}
         {data && data.monthlyData.length > 0 && (
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-8">
             <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-4">
               Tabungan per Bulan
             </h2>
@@ -303,17 +303,17 @@ export default function TabunganPage() {
                 return (
                   <div
                     key={item.month}
-                    className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-700 dark:to-gray-600 rounded-lg p-4"
+                    className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4"
                   >
                     <div className="flex items-center justify-between mb-2">
                       <p className="text-sm font-semibold text-gray-700 dark:text-gray-200">
                         {monthName} {year}
                       </p>
-                      <span className="text-xs bg-blue-600 text-white px-2 py-1 rounded-full">
+                      <span className="text-xs bg-brand-primary text-white px-2 py-1 rounded-full">
                         {item.count}x
                       </span>
                     </div>
-                    <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                    <p className="text-2xl font-bold text-accent">
                       {formatCurrency(item.total)}
                     </p>
                   </div>
@@ -325,7 +325,7 @@ export default function TabunganPage() {
 
         {/* Transactions List */}
         {data && (
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
             <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-4">
               Riwayat Transaksi
             </h2>
@@ -338,7 +338,7 @@ export default function TabunganPage() {
                 </p>
                 <Link
                   href="/transaksi"
-                  className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold mt-4"
+                  className="inline-block bg-brand-primary hover:bg-brand-primary-hover text-white px-6 py-3 rounded-lg font-semibold mt-4"
                 >
                   + Tambah Tabungan Pertama
                 </Link>
@@ -351,7 +351,7 @@ export default function TabunganPage() {
                     className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
                   >
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                      <div className="w-12 h-12 bg-status-info-light bg-status-info-light rounded-full flex items-center justify-center">
                         <span className="text-2xl">{transaction.category.icon || '💰'}</span>
                       </div>
                       <div>
@@ -368,11 +368,11 @@ export default function TabunganPage() {
                     </div>
                     <div className="text-right">
                       {transaction.income > 0 ? (
-                        <p className="text-xl font-bold text-green-600">
+                        <p className="text-xl font-bold text-income">
                           +{formatCurrency(transaction.income)}
                         </p>
                       ) : (
-                        <p className="text-xl font-bold text-blue-600">
+                        <p className="text-xl font-bold text-accent">
                           {formatCurrency(transaction.expense)}
                         </p>
                       )}
@@ -385,7 +385,7 @@ export default function TabunganPage() {
         )}
 
         {/* Tips */}
-        <div className="mt-8 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg shadow-lg p-6 text-white">
+        <div className="mt-8 bg-status-info-light rounded-lg p-6 text-gray-800 dark:text-gray-100">
           <div className="flex items-start gap-4">
             <div className="text-4xl">💡</div>
             <div>

@@ -327,7 +327,7 @@ export default function KategoriPage() {
   const expenseCategories = categories.filter(c => c.type === 'expense')
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4 md:p-8">
+    <div className="min-h-screen bg-paper p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
@@ -350,7 +350,7 @@ export default function KategoriPage() {
           <div className="flex gap-3">
             <Link
               href="/admin/emoji-manager"
-              className="bg-brand-secondary hover:bg-brand-secondary-hover text-white px-6 py-3 rounded-lg font-semibold shadow-lg transition-colors"
+              className="bg-brand-secondary hover:bg-brand-secondary-hover text-white px-6 py-3 rounded-lg font-semibold shadow-sm transition-colors"
             >
               🎨 Kelola Emoji
             </Link>
@@ -365,7 +365,7 @@ export default function KategoriPage() {
                   color: '#6b7280',
                 })
               }}
-              className="bg-brand-primary hover:bg-brand-primary-hover text-white px-6 py-3 rounded-lg font-semibold shadow-lg transition-colors"
+              className="bg-brand-primary hover:bg-brand-primary-hover text-white px-6 py-3 rounded-lg font-semibold shadow-sm transition-colors"
             >
               + Tambah Kategori
             </button>
@@ -421,7 +421,7 @@ export default function KategoriPage() {
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       required
                       placeholder="Contoh: ATK Kantor"
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent dark:bg-gray-700 dark:text-white"
                     />
                   </div>
 
@@ -436,8 +436,8 @@ export default function KategoriPage() {
                         onClick={() => setFormData({ ...formData, type: 'income' })}
                         className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                           formData.type === 'income'
-                            ? 'bg-status-success text-white'
-                            : 'bg-neutral-200 dark:bg-neutral-700 text-gray-700 dark:text-gray-300'
+                            ? 'bg-income-solid text-white'
+                            : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
                         }`}
                       >
                         📈 Pemasukan
@@ -447,8 +447,8 @@ export default function KategoriPage() {
                         onClick={() => setFormData({ ...formData, type: 'expense' })}
                         className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                           formData.type === 'expense'
-                            ? 'bg-status-danger text-white'
-                            : 'bg-neutral-200 dark:bg-neutral-700 text-gray-700 dark:text-gray-300'
+                            ? 'bg-expense-solid text-white'
+                            : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
                         }`}
                       >
                         📉 Pengeluaran
@@ -490,7 +490,7 @@ export default function KategoriPage() {
                           onClick={() => setFormData({ ...formData, color: color.value })}
                           className={`flex items-center gap-2 px-3 py-2 rounded-lg border-2 ${
                             formData.color === color.value
-                              ? 'border-blue-600 dark:border-blue-400'
+                              ? 'border-accent'
                               : 'border-gray-300 dark:border-gray-600'
                           }`}
                         >
@@ -511,13 +511,11 @@ export default function KategoriPage() {
                     <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Preview:</p>
                     <div className="flex items-center gap-2">
                       <span className="text-2xl">{formData.icon}</span>
-                      <span
-                        className="font-semibold"
-                        style={{ color: formData.color }}
-                      >
+                      <span className="font-semibold text-gray-800 dark:text-white flex items-center gap-2 min-w-0">
+                        <span aria-hidden="true" className="inline-block w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: formData.color }} />
                         {formData.name || 'Nama Kategori'}
                       </span>
-                      <span className="text-xs px-2 py-1 rounded bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300">
+                      <span className="text-xs px-2 py-1 rounded bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200">
                         {formData.type === 'income' ? 'Pemasukan' : 'Pengeluaran'}
                       </span>
                     </div>
@@ -551,7 +549,7 @@ export default function KategoriPage() {
         {/* Categories List */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Income Categories */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
                 <span className="text-2xl">📈</span>
@@ -563,9 +561,9 @@ export default function KategoriPage() {
             </div>
 
             {loading ? (
-              <p className="text-center py-8 text-gray-500">Loading...</p>
+              <p className="text-center py-8 text-gray-500 dark:text-gray-400">Loading...</p>
             ) : incomeCategories.length === 0 ? (
-              <p className="text-center py-8 text-gray-500">Belum ada kategori</p>
+              <p className="text-center py-8 text-gray-500 dark:text-gray-400">Belum ada kategori</p>
             ) : (
               <div className="space-y-2">
                 {incomeCategories.map((category) => (
@@ -573,7 +571,7 @@ export default function KategoriPage() {
                     key={category.id}
                     className={`flex items-center justify-between p-3 rounded-lg ${
                       category.isActive
-                        ? 'bg-status-success-light'
+                        ? 'bg-gray-50 dark:bg-gray-700'
                         : 'bg-gray-100 dark:bg-gray-700 opacity-60'
                     }`}
                   >
@@ -581,9 +579,9 @@ export default function KategoriPage() {
                       <span className="text-2xl">{category.icon}</span>
                       <div>
                         <p
-                          className="font-semibold"
-                          style={{ color: category.color || '#6b7280' }}
+                          className="font-semibold text-gray-800 dark:text-white flex items-center gap-2"
                         >
+                          <span aria-hidden="true" className="inline-block w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: category.color || '#6b7280' }} />
                           {category.name}
                         </p>
                         {!category.isActive && (
@@ -596,7 +594,7 @@ export default function KategoriPage() {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => handleEdit(category)}
-                        className="text-brand-primary hover:text-brand-primary-hover text-sm font-medium"
+                        className="text-accent hover:text-accent-hover text-sm font-medium"
                       >
                         Edit
                       </button>
@@ -618,7 +616,7 @@ export default function KategoriPage() {
           </div>
 
           {/* Expense Categories */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
                 <span className="text-2xl">📉</span>
@@ -630,9 +628,9 @@ export default function KategoriPage() {
             </div>
 
             {loading ? (
-              <p className="text-center py-8 text-gray-500">Loading...</p>
+              <p className="text-center py-8 text-gray-500 dark:text-gray-400">Loading...</p>
             ) : expenseCategories.length === 0 ? (
-              <p className="text-center py-8 text-gray-500">Belum ada kategori</p>
+              <p className="text-center py-8 text-gray-500 dark:text-gray-400">Belum ada kategori</p>
             ) : (
               <div className="space-y-2">
                 {expenseCategories.map((category) => (
@@ -640,7 +638,7 @@ export default function KategoriPage() {
                     key={category.id}
                     className={`flex items-center justify-between p-3 rounded-lg ${
                       category.isActive
-                        ? 'bg-status-danger-light'
+                        ? 'bg-gray-50 dark:bg-gray-700'
                         : 'bg-gray-100 dark:bg-gray-700 opacity-60'
                     }`}
                   >
@@ -648,9 +646,9 @@ export default function KategoriPage() {
                       <span className="text-2xl">{category.icon}</span>
                       <div>
                         <p
-                          className="font-semibold"
-                          style={{ color: category.color || '#6b7280' }}
+                          className="font-semibold text-gray-800 dark:text-white flex items-center gap-2"
                         >
+                          <span aria-hidden="true" className="inline-block w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: category.color || '#6b7280' }} />
                           {category.name}
                         </p>
                         {!category.isActive && (
@@ -663,7 +661,7 @@ export default function KategoriPage() {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => handleEdit(category)}
-                        className="text-brand-primary hover:text-brand-primary-hover text-sm font-medium"
+                        className="text-accent hover:text-accent-hover text-sm font-medium"
                       >
                         Edit
                       </button>
@@ -687,14 +685,14 @@ export default function KategoriPage() {
 
         {/* Reimbursement Categories Section */}
         <div className="mt-8">
-          <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg shadow-lg p-6 mb-6">
+          <div className="mb-6">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                <h2 className="text-2xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
                   <span className="text-3xl">📂</span>
                   Kategori Reimbursement
                 </h2>
-                <p className="text-purple-100 mt-1">
+                <p className="text-ink-muted mt-1">
                   Kelola kategori untuk pengeluaran kantor yang perlu direimburs
                 </p>
               </div>
@@ -707,14 +705,14 @@ export default function KategoriPage() {
                     icon: '📦',
                   })
                 }}
-                className="bg-brand-secondary/10 hover:bg-brand-secondary/20 text-brand-secondary px-6 py-3 rounded-lg font-semibold shadow-lg transition-colors border-2 border-brand-secondary"
+                className="bg-brand-secondary hover:bg-brand-secondary-hover text-white px-6 py-3 rounded-lg font-semibold transition-colors"
               >
                 + Tambah Kategori
               </button>
             </div>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
                 Daftar Kategori
@@ -725,9 +723,9 @@ export default function KategoriPage() {
             </div>
 
             {reimbLoading ? (
-              <p className="text-center py-8 text-gray-500">Loading...</p>
+              <p className="text-center py-8 text-gray-500 dark:text-gray-400">Loading...</p>
             ) : reimbursementCategories.length === 0 ? (
-              <p className="text-center py-8 text-gray-500">Belum ada kategori reimbursement</p>
+              <p className="text-center py-8 text-gray-500 dark:text-gray-400">Belum ada kategori reimbursement</p>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                 {reimbursementCategories.map((category) => (
@@ -755,7 +753,7 @@ export default function KategoriPage() {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => handleReimbEdit(category)}
-                        className="text-brand-primary hover:text-brand-primary-hover text-sm font-medium"
+                        className="text-accent hover:text-accent-hover text-sm font-medium"
                       >
                         ✏️
                       </button>
@@ -812,7 +810,7 @@ export default function KategoriPage() {
                       onChange={(e) => setReimbFormData({ ...reimbFormData, name: e.target.value })}
                       required
                       placeholder="Contoh: Makan & Minum"
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent dark:bg-gray-700 dark:text-white"
                     />
                   </div>
 

@@ -58,9 +58,9 @@ export default function ReimbursementFormFields({
   }
 
   return (
-    <div className={`bg-orange-50 dark:bg-orange-900/20 p-4 rounded-lg space-y-3 ${className}`}>
+    <div className={`bg-status-warning-light bg-status-warning-light p-4 rounded-lg space-y-3 ${className}`}>
       {/* Header */}
-      <div className="flex items-center gap-2 text-orange-600 dark:text-orange-400 font-medium">
+      <div className="flex items-center gap-2 text-caution font-medium">
         <span>🏢</span>
         <span>Detail Reimbursement</span>
       </div>
@@ -79,7 +79,7 @@ export default function ReimbursementFormFields({
             value={officeCategoryId}
             onChange={(e) => onOfficeCategoryChange(e.target.value)}
             required={required}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent dark:bg-gray-700 dark:text-white"
           >
             <option value="">Pilih Kategori Kantor</option>
             {categories.map((cat) => (
@@ -102,7 +102,7 @@ export default function ReimbursementFormFields({
           onUploadError={(error) => showError(error)}
         />
         {!receiptPhoto && (
-          <p className="text-xs text-orange-600 dark:text-orange-400 mt-1">
+          <p className="text-xs text-caution mt-1">
             ⚠️ Disarankan upload foto nota untuk mempermudah klaim reimbursement
           </p>
         )}
@@ -117,7 +117,7 @@ export default function ReimbursementFormFields({
           value={notes}
           onChange={(e) => onNotesChange(e.target.value)}
           rows={2}
-          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent dark:bg-gray-700 dark:text-white"
           placeholder="Catatan untuk reimbursement..."
         />
       </div>

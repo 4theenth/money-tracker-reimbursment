@@ -107,8 +107,8 @@ export default function ImageUpload({ onUploadSuccess, onUploadError, currentIma
           className={`
             border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors
             ${isDragging 
-              ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' 
-              : 'border-gray-300 dark:border-gray-600 hover:border-blue-400 dark:hover:border-blue-500'
+              ? 'border-accent bg-status-info-light bg-status-info-light' 
+              : 'border-gray-300 dark:border-gray-600 hover:border-accent'
             }
             ${uploading ? 'opacity-50 cursor-not-allowed' : ''}
           `}
@@ -136,10 +136,10 @@ export default function ImageUpload({ onUploadSuccess, onUploadError, currentIma
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 atau klik untuk browse file
               </p>
-              <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
                 Format: JPG, PNG, WebP • Max 10MB
               </p>
-              <p className="text-xs text-green-600 dark:text-green-400">
+              <p className="text-xs text-income">
                 ✨ Otomatis dioptimasi menjadi WebP (~300-500KB)
               </p>
             </div>
@@ -155,7 +155,7 @@ export default function ImageUpload({ onUploadSuccess, onUploadError, currentIma
           <button
             type="button"
             onClick={handleRemove}
-            className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-lg transition-colors"
+            className="absolute top-2 right-2 bg-expense-solid hover:bg-expense-solid-hover text-white rounded-full w-8 h-8 flex items-center justify-center shadow-lg transition-colors"
           >
             ✕
           </button>

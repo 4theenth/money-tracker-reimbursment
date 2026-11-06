@@ -131,7 +131,7 @@ export default function AddCompanyModal({ isOpen, onClose, onSuccess }: Props) {
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent dark:bg-gray-700 dark:text-white"
             placeholder="PT Contoh Perusahaan"
             disabled={saving}
             required
@@ -149,7 +149,7 @@ export default function AddCompanyModal({ isOpen, onClose, onSuccess }: Props) {
             {!logoPreview ? (
               <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
                 <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                  <svg className="w-10 h-10 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-10 h-10 mb-3 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                   </svg>
                   <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
@@ -167,7 +167,7 @@ export default function AddCompanyModal({ isOpen, onClose, onSuccess }: Props) {
               </label>
             ) : (
               <div className="relative">
-                <div className="flex items-center justify-center w-full h-32 border-2 border-green-300 dark:border-green-600 rounded-lg bg-gray-50 dark:bg-gray-700 p-3">
+                <div className="flex items-center justify-center w-full h-32 border-2 border-income/30 dark:border-income rounded-lg bg-gray-50 dark:bg-gray-700 p-3">
                   <img
                     src={logoPreview}
                     alt="Logo preview"
@@ -180,7 +180,7 @@ export default function AddCompanyModal({ isOpen, onClose, onSuccess }: Props) {
                     setLogoFile(null)
                     setLogoPreview(null)
                   }}
-                  className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1.5 transition-colors"
+                  className="absolute top-2 right-2 bg-expense-solid hover:bg-expense-solid-hover text-white rounded-full p-1.5 transition-colors"
                   title="Hapus gambar"
                   disabled={saving}
                 >
@@ -200,7 +200,7 @@ export default function AddCompanyModal({ isOpen, onClose, onSuccess }: Props) {
             id="setAsDefault"
             checked={isDefault}
             onChange={(e) => setIsDefault(e.target.checked)}
-            className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+            className="w-4 h-4 text-accent border-gray-300 rounded focus:ring-accent"
             disabled={saving}
           />
           <label htmlFor="setAsDefault" className="text-sm text-gray-700 dark:text-gray-300">
@@ -213,7 +213,7 @@ export default function AddCompanyModal({ isOpen, onClose, onSuccess }: Props) {
           <button
             type="submit"
             disabled={saving}
-            className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+            className="flex-1 bg-income-solid hover:bg-income-solid-hover disabled:bg-gray-400 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
           >
             {saving ? 'Menyimpan...' : '✓ Simpan'}
           </button>
