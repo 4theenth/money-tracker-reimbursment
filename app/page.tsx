@@ -1,21 +1,32 @@
 import { prisma } from '@/lib/prisma'
 import { formatCurrency } from '@/lib/utils'
 import { getBudgetPlanningData } from '@/lib/budget'
+import { calculateAccountBalances } from '@/lib/accounts'
+import { connection } from 'next/server'
 import Link from 'next/link'
+import { BookOpen, Building2, ChartPie, PiggyBank, Tags, Wallet } from 'lucide-react'
 import QuickAddTransaction from '@/components/QuickAddTransaction'
+import DatabaseStatusToast from '@/components/DatabaseStatusToast'
 
-async function getCashData() {
-  const res = await fetch('http://localhost:3000/api/cash', { 
-    cache: 'no-store',
-    next: { revalidate: 0 }
-  })
-  if (!res.ok) {
-    return { cashOnHand: 0, totalSavings: 0, totalWealth: 0 }
-  }
-  return res.json()
+const MENU_ITEMS = [
+  { href: '/transaksi', label: 'Transaksi', description: 'Catat pemasukan, belanja & kas', Icon: Wallet },
+  { href: '/kategori', label: 'Kategori', description: 'Kelola pos belanja & icon emoji', Icon: Tags },
+  { href: '/tabungan', label: 'Tabungan', description: 'Saldo rekening bank & dompet digital', Icon: PiggyBank },
+  { href: '/tabungan/buku', label: 'Buku Tabungan', description: 'Riwayat mutasi tiap rekening', Icon: BookOpen },
+  { href: '/budget', label: 'Anggaran', description: 'Target belanja & status pos', Icon: ChartPie },
+  { href: '/reimbursement', label: 'Reimbursement', description: 'Klaim biaya & export laporan', Icon: Building2 },
+]
+
+const PANEL = 'bg-surface rounded-lg border border-gray-200 dark:border-gray-700'
+
+function amountColor(amount: number) {
+  return amount < 0 ? 'text-expense' : ''
 }
 
 export default async function Home() {
+  // Balances must reflect the database at request time, never a build-time snapshot
+  await connection()
+
   // Fetch summary data
   const categories = await prisma.category.findMany({
     where: { isActive: true }
@@ -36,7 +47,13 @@ export default async function Home() {
   })
 
   // Get cash and savings data
-  const cashData = await getCashData()
+  const cashData = await calculateAccountBalances()
+
+  const pendingClaims = await prisma.reimbursement.findMany({
+    where: { status: 'pending' },
+    select: { transaction: { select: { expense: true } } },
+  })
+  const pendingClaimsTotal = pendingClaims.reduce((sum, claim) => sum + claim.transaction.expense, 0)
 
   // Get budget planning data for current month
   const now = new Date()
@@ -49,421 +66,211 @@ export default async function Home() {
     console.error('Error fetching budget data for homepage:', error)
   }
 
+  const savingsLocations = Object.entries(cashData.locationBalances).filter(([name]) => name !== 'Tunai / Dompet')
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <header className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 dark:text-white mb-2">
-            💰 Money Tracker
-          </h1>
-          <p className="text-gray-600 dark:text-gray-300">
-            Kelola keuangan pribadi dan reimbursement kantor Anda
+    <div className="min-h-screen bg-paper text-ink">
+      <div className="container mx-auto max-w-6xl px-4 pt-8 pb-24">
+        <header className="mb-6">
+          <h1 className="text-3xl font-bold">Money Tracker</h1>
+          <p className="text-ink-muted mt-1">
+            Keuangan pribadi dan reimbursement kantor
           </p>
         </header>
 
-        {/* Main Summary Cards - Cash & Wealth */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-          <Link
-            href="/transaksi"
-            className="bg-gradient-to-br from-green-500 to-green-600 rounded-lg shadow-lg p-6 text-white group cursor-pointer hover:shadow-xl hover:-translate-y-1 transition-all duration-200 block"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-green-100 text-sm mb-1">Cash On Hand</p>
-                <p className={`text-3xl font-bold ${
-                  cashData.cashOnHand >= 0 ? '' : 'text-red-200'
-                }`}>
-                  {formatCurrency(cashData.cashOnHand)}
-                </p>
-                <p className="text-green-100 text-xs mt-2">Uang di tangan/dompet</p>
-              </div>
-              <div className="text-5xl opacity-80 group-hover:scale-110 transition-transform">💵</div>
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] gap-6 mb-8">
+          {/* Money position, set as a ledger sum */}
+          <section aria-labelledby="posisi-uang" className={`${PANEL} p-6`}>
+            <div className="flex flex-wrap items-baseline justify-between gap-x-4 mb-4">
+              <h2 id="posisi-uang" className="text-lg font-semibold">Posisi uang saat ini</h2>
+              <Link href="/tabungan/buku" className="text-sm font-medium text-accent hover:text-accent-hover whitespace-nowrap">
+                Lihat buku tabungan
+              </Link>
             </div>
-            <div className="mt-4 pt-2 border-t border-white/20 flex items-center justify-between text-xs text-green-100 font-medium">
-              <span>Buka Catatan Transaksi</span>
-              <span className="group-hover:translate-x-1 transition-transform font-bold">→</span>
-            </div>
-          </Link>
 
-          <Link
-            href="/tabungan"
-            className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg shadow-lg p-6 text-white group cursor-pointer hover:shadow-xl hover:-translate-y-1 transition-all duration-200 block"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-purple-100 text-sm mb-1">Total Tabungan</p>
-                <p className={`text-3xl font-bold ${
-                  cashData.totalSavings >= 0 ? '' : 'text-red-200'
-                }`}>
-                  {formatCurrency(cashData.totalSavings)}
-                </p>
-                <p className="text-purple-100 text-xs mt-2">Di bank & dompet digital</p>
-                {cashData.locationBalances && (
-                  <div className="mt-2 text-xs text-purple-100/90 flex flex-wrap gap-1.5">
-                    {Object.entries(cashData.locationBalances)
-                      .filter(([name]) => name !== 'Tunai / Dompet')
-                      .map(([name, data]: [string, any]) => (
-                        <span key={name} className="bg-purple-700/50 px-2 py-0.5 rounded text-[11px] font-medium">
-                          {name}: {formatCurrency(data.balance)}
-                        </span>
-                      ))}
+            <Link href="/transaksi" className="flex items-baseline justify-between gap-4 py-2 hover:text-accent transition-colors">
+              <span>Tunai di dompet</span>
+              <span className={`font-medium whitespace-nowrap ${amountColor(cashData.cashOnHand)}`}>
+                {formatCurrency(cashData.cashOnHand)}
+              </span>
+            </Link>
+
+            <Link href="/tabungan" className="flex items-baseline justify-between gap-4 py-2 hover:text-accent transition-colors">
+              <span>Tabungan</span>
+              <span className={`font-medium whitespace-nowrap ${amountColor(cashData.totalSavings)}`}>
+                {formatCurrency(cashData.totalSavings)}
+              </span>
+            </Link>
+
+            {savingsLocations.length > 0 && (
+              <ul className="pl-4 pb-2">
+                {savingsLocations.map(([name, data]) => (
+                  <li key={name} className="flex items-baseline justify-between gap-4 py-0.5 text-sm text-ink-muted">
+                    <span>{name}</span>
+                    <span className="whitespace-nowrap">{formatCurrency(data.balance)}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            <Link
+              href="/tabungan/buku"
+              className="flex flex-wrap items-baseline justify-between gap-x-4 mt-2 py-3 border-t border-gray-300 dark:border-gray-600 border-b-4 border-b-gray-800 dark:border-b-gray-200 [border-bottom-style:double] hover:text-accent transition-colors"
+            >
+              <span className="font-semibold">Total kekayaan</span>
+              <span className={`text-3xl font-bold whitespace-nowrap ${amountColor(cashData.totalWealth)}`}>
+                {formatCurrency(cashData.totalWealth)}
+              </span>
+            </Link>
+
+            {pendingClaimsTotal > 0 && (
+              <Link href="/reimbursement" className="flex flex-wrap items-baseline justify-between gap-x-4 pt-3 text-sm text-ink-muted hover:text-accent transition-colors">
+                <span>Menunggu penggantian kantor, belum termasuk total</span>
+                <span className="whitespace-nowrap">{formatCurrency(pendingClaimsTotal)}</span>
+              </Link>
+            )}
+          </section>
+
+          <div className="flex flex-col gap-6">
+            {/* Budget for the current month */}
+            <section aria-labelledby="anggaran" className={`${PANEL} p-6`}>
+              {budgetData && budgetData.period.isConfigured ? (
+                <>
+                  <div className="flex items-baseline justify-between gap-4 mb-3">
+                    <h2 id="anggaran" className="text-lg font-semibold">
+                      Anggaran {budgetData.period.label}
+                    </h2>
+                    <Link href="/budget" className="text-sm font-medium text-accent hover:text-accent-hover whitespace-nowrap">
+                      Lihat detail
+                    </Link>
                   </div>
-                )}
-              </div>
-              <div className="text-5xl opacity-80 group-hover:scale-110 transition-transform">🏦</div>
-            </div>
-            <div className="mt-4 pt-2 border-t border-white/20 flex items-center justify-between text-xs text-purple-100 font-medium">
-              <span>Kelola Saldo Rekening</span>
-              <span className="group-hover:translate-x-1 transition-transform font-bold">→</span>
-            </div>
-          </Link>
-
-          <Link
-            href="/tabungan/buku"
-            className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-lg p-6 text-white group cursor-pointer hover:shadow-xl hover:-translate-y-1 transition-all duration-200 block"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-blue-100 text-sm mb-1">Total Kekayaan</p>
-                <p className={`text-3xl font-bold ${
-                  cashData.totalWealth >= 0 ? '' : 'text-red-200'
-                }`}>
-                  {formatCurrency(cashData.totalWealth)}
-                </p>
-                <p className="text-blue-100 text-xs mt-2">Cash + Tabungan</p>
-              </div>
-              <div className="text-5xl opacity-80 group-hover:scale-110 transition-transform">💎</div>
-            </div>
-            <div className="mt-4 pt-2 border-t border-white/20 flex items-center justify-between text-xs text-blue-100 font-medium">
-              <span>Lihat Buku Tabungan & Mutasi</span>
-              <span className="group-hover:translate-x-1 transition-transform font-bold">→</span>
-            </div>
-          </Link>
-        </div>
-
-        {/* Budget Health / Spending Target Banner Card */}
-        {budgetData && budgetData.period.isConfigured && (
-          <Link
-            href="/budget"
-            className="mb-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-5 border-2 border-transparent hover:border-amber-500/40 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 group block cursor-pointer"
-          >
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-              <div className="flex items-center gap-3.5">
-                <div className="w-12 h-12 rounded-xl bg-amber-100 dark:bg-amber-950/60 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
-                  🎯
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-base font-bold text-gray-800 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
-                      Rencana Anggaran ({budgetData.period.label})
-                    </h3>
-                    <span className="text-[11px] px-2 py-0.5 rounded-full font-semibold bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300">
-                      Target Bulanan
-                    </span>
+                  <div className="h-2.5 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 mb-2">
+                    <div
+                      className={`h-full rounded-full ${
+                        budgetData.totalExpensePercentage > 100
+                          ? 'bg-expense'
+                          : budgetData.totalExpensePercentage >= 80
+                          ? 'bg-caution'
+                          : 'bg-income'
+                      }`}
+                      style={{ width: `${Math.min(budgetData.totalExpensePercentage, 100)}%` }}
+                    />
                   </div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    Realisasi:{' '}
-                    <span className="font-semibold text-gray-800 dark:text-gray-200">
-                      {formatCurrency(budgetData.totalActualExpense)}
-                    </span>{' '}
-                    dari target{' '}
-                    <span className="font-semibold text-gray-800 dark:text-gray-200">
-                      {formatCurrency(budgetData.totalTargetExpense)}
-                    </span>
-                  </p>
-                </div>
-              </div>
-
-              {/* Progress Bar Container */}
-              <div className="flex-1 max-w-lg">
-                <div className="flex items-center justify-between text-xs mb-1.5 font-medium">
-                  <span className="text-gray-600 dark:text-gray-400">
-                    Sisa Kuota:{' '}
-                    <strong
-                      className={
-                        budgetData.totalExpenseDifference >= 0
-                          ? 'text-emerald-600 dark:text-emerald-400 font-mono'
-                          : 'text-rose-600 dark:text-rose-400 font-mono'
-                      }
-                    >
-                      {budgetData.totalExpenseDifference >= 0 ? '+' : '-'}
+                  <div className="flex flex-wrap items-baseline justify-between gap-x-4 text-sm mb-1">
+                    <span className="font-semibold">{budgetData.totalExpensePercentage}% terpakai</span>
+                    <span className={`font-semibold whitespace-nowrap ${budgetData.totalExpenseDifference >= 0 ? 'text-income' : 'text-expense'}`}>
+                      {budgetData.totalExpenseDifference >= 0 ? 'Sisa' : 'Lebih'}{' '}
                       {formatCurrency(Math.abs(budgetData.totalExpenseDifference))}
-                    </strong>
-                  </span>
-                  <span
-                    className={`font-mono font-bold ${
-                      budgetData.totalExpensePercentage > 100
-                        ? 'text-rose-600 dark:text-rose-400'
-                        : budgetData.totalExpensePercentage >= 80
-                        ? 'text-amber-600 dark:text-amber-400'
-                        : 'text-emerald-600 dark:text-emerald-400'
-                    }`}
-                  >
-                    {budgetData.totalExpensePercentage}% Terpakai
-                  </span>
-                </div>
-                <div className="w-full bg-gray-200 dark:bg-gray-700 h-2.5 rounded-full overflow-hidden">
-                  <div
-                    className={`h-full rounded-full transition-all duration-300 ${
-                      budgetData.totalExpensePercentage > 100
-                        ? 'bg-rose-500 animate-pulse'
-                        : budgetData.totalExpensePercentage >= 80
-                        ? 'bg-amber-500'
-                        : 'bg-emerald-500'
-                    }`}
-                    style={{
-                      width: `${Math.min(budgetData.totalExpensePercentage, 100)}%`,
-                    }}
-                  />
-                </div>
-              </div>
+                    </span>
+                  </div>
+                  <p className="text-sm text-ink-muted mb-3">
+                    {formatCurrency(budgetData.totalActualExpense)} dari target {formatCurrency(budgetData.totalTargetExpense)}
+                  </p>
+                  <p className="flex flex-wrap gap-x-4 text-sm font-medium">
+                    <span className="text-income">{budgetData.statusCounts.ok} aman</span>
+                    <span className="text-caution">{budgetData.statusCounts.alert} hampir habis</span>
+                    <span className="text-expense">{budgetData.statusCounts.over} melebihi target</span>
+                  </p>
+                </>
+              ) : (
+                <>
+                  <h2 id="anggaran" className="text-lg font-semibold mb-1">Anggaran bulan ini</h2>
+                  <p className="text-sm text-ink-muted mb-3">
+                    {budgetData
+                      ? 'Anggaran bulan ini belum diatur.'
+                      : 'Data anggaran tidak bisa dimuat.'}
+                  </p>
+                  <Link href="/budget" className="text-sm font-medium text-accent hover:text-accent-hover">
+                    Buka halaman anggaran
+                  </Link>
+                </>
+              )}
+            </section>
 
-              {/* Health Badges & Arrow */}
-              <div className="flex items-center justify-between lg:justify-end gap-3 pt-2 lg:pt-0 border-t lg:border-t-0 border-gray-100 dark:border-gray-700">
-                <div className="flex items-center gap-1.5 text-xs font-semibold">
-                  <span className="text-emerald-600 dark:text-emerald-400">
-                    🟢 {budgetData.statusCounts.ok}
-                  </span>
-                  <span>•</span>
-                  <span className="text-amber-600 dark:text-amber-400">
-                    🟡 {budgetData.statusCounts.alert}
-                  </span>
-                  <span>•</span>
-                  <span className="text-rose-600 dark:text-rose-400">
-                    🔴 {budgetData.statusCounts.over}
-                  </span>
-                </div>
-                <span className="text-xs font-bold text-gray-400 group-hover:text-amber-500 group-hover:translate-x-1 transition-all flex items-center gap-1">
-                  <span>Lihat Detail</span>
-                  <span>→</span>
-                </span>
-              </div>
-            </div>
-          </Link>
-        )}
-
-        {/* Summary Cards - Income & Expense */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <Link
-            href="/transaksi"
-            className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 border border-transparent hover:border-green-500/40 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 group cursor-pointer block"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-500 dark:text-gray-400 text-sm mb-1">Total Pemasukan</p>
-                <p className="text-2xl font-bold text-green-600">
+            {/* All-time totals */}
+            <section aria-label="Total seluruh catatan" className={`${PANEL} p-6`}>
+              <Link href="/transaksi" className="flex items-baseline justify-between gap-4 py-1 hover:underline">
+                <span>Total pemasukan</span>
+                <span className="font-semibold text-income whitespace-nowrap">
                   {formatCurrency(totalIncome._sum.income || 0)}
-                </p>
-                <p className="text-xs text-green-600/80 dark:text-green-400/80 mt-1 font-medium group-hover:underline flex items-center gap-1">
-                  <span>Lihat Riwayat Transaksi</span>
-                  <span className="group-hover:translate-x-1 transition-transform">→</span>
-                </p>
-              </div>
-              <div className="text-4xl group-hover:scale-110 transition-transform">📈</div>
-            </div>
-          </Link>
-
-          <Link
-            href="/transaksi"
-            className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 border border-transparent hover:border-red-500/40 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 group cursor-pointer block"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-500 dark:text-gray-400 text-sm mb-1">Total Pengeluaran</p>
-                <p className="text-2xl font-bold text-red-600">
+                </span>
+              </Link>
+              <Link href="/transaksi" className="flex items-baseline justify-between gap-4 py-1 hover:underline">
+                <span>Total pengeluaran</span>
+                <span className="font-semibold text-expense whitespace-nowrap">
                   {formatCurrency(totalExpense._sum.expense || 0)}
-                </p>
-                <p className="text-xs text-red-600/80 dark:text-red-400/80 mt-1 font-medium group-hover:underline flex items-center gap-1">
-                  <span>Lihat Riwayat Transaksi</span>
-                  <span className="group-hover:translate-x-1 transition-transform">→</span>
-                </p>
-              </div>
-              <div className="text-4xl group-hover:scale-110 transition-transform">📉</div>
-            </div>
-          </Link>
+                </span>
+              </Link>
+              <p className="text-xs text-ink-muted mt-2">Dihitung dari seluruh catatan transaksi</p>
+            </section>
+          </div>
         </div>
 
-        {/* Quick Actions (Action Hub) */}
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-bold text-gray-800 dark:text-white">
-            Menu Utama
-          </h2>
-          <span className="text-xs text-gray-500 dark:text-gray-400">
-            Akses cepat fitur aplikasi
-          </span>
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
-          <Link
-            href="/transaksi"
-            className="group relative bg-white dark:bg-gray-800 rounded-xl p-5 border-2 border-emerald-500/20 hover:border-emerald-500 shadow hover:shadow-xl hover:-translate-y-1 active:scale-[0.98] transition-all duration-200 cursor-pointer block"
-          >
-            <div className="flex items-start justify-between mb-3">
-              <div className="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 flex items-center justify-center text-2xl shadow-sm group-hover:scale-110 transition-transform">
-                💰
-              </div>
-              <span className="text-emerald-500 group-hover:translate-x-1 transition-transform text-base font-bold">
-                →
-              </span>
-            </div>
-            <h3 className="text-base font-bold text-gray-800 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-              Transaksi
-            </h3>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              Catat pemasukan, belanja & kas
-            </p>
-          </Link>
-
-          <Link
-            href="/kategori"
-            className="group relative bg-white dark:bg-gray-800 rounded-xl p-5 border-2 border-indigo-500/20 hover:border-indigo-500 shadow hover:shadow-xl hover:-translate-y-1 active:scale-[0.98] transition-all duration-200 cursor-pointer block"
-          >
-            <div className="flex items-start justify-between mb-3">
-              <div className="w-12 h-12 rounded-xl bg-indigo-100 dark:bg-indigo-950/60 flex items-center justify-center text-2xl shadow-sm group-hover:scale-110 transition-transform">
-                🏷️
-              </div>
-              <span className="text-indigo-500 group-hover:translate-x-1 transition-transform text-base font-bold">
-                →
-              </span>
-            </div>
-            <h3 className="text-base font-bold text-gray-800 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-              Kategori
-            </h3>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              Kelola pos belanja & icon emoji
-            </p>
-          </Link>
-
-          <Link
-            href="/tabungan"
-            className="group relative bg-white dark:bg-gray-800 rounded-xl p-5 border-2 border-blue-500/20 hover:border-blue-500 shadow hover:shadow-xl hover:-translate-y-1 active:scale-[0.98] transition-all duration-200 cursor-pointer block"
-          >
-            <div className="flex items-start justify-between mb-3">
-              <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-950/60 flex items-center justify-center text-2xl shadow-sm group-hover:scale-110 transition-transform">
-                💎
-              </div>
-              <span className="text-blue-500 group-hover:translate-x-1 transition-transform text-base font-bold">
-                →
-              </span>
-            </div>
-            <h3 className="text-base font-bold text-gray-800 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-              Tabungan
-            </h3>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              Saldo rekening bank & passbook
-            </p>
-          </Link>
-
-          <Link
-            href="/budget"
-            className="group relative bg-white dark:bg-gray-800 rounded-xl p-5 border-2 border-amber-500/20 hover:border-amber-500 shadow hover:shadow-xl hover:-translate-y-1 active:scale-[0.98] transition-all duration-200 cursor-pointer block"
-          >
-            <div className="flex items-start justify-between mb-3">
-              <div className="w-12 h-12 rounded-xl bg-amber-100 dark:bg-amber-950/60 flex items-center justify-center text-2xl shadow-sm group-hover:scale-110 transition-transform">
-                🎯
-              </div>
-              <span className="text-amber-500 group-hover:translate-x-1 transition-transform text-base font-bold">
-                →
-              </span>
-            </div>
-            <h3 className="text-base font-bold text-gray-800 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
-              Anggaran
-            </h3>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              Target belanja & status pos
-            </p>
-          </Link>
-
-          <Link
-            href="/reimbursement"
-            className="group relative bg-white dark:bg-gray-800 rounded-xl p-5 border-2 border-purple-500/20 hover:border-purple-500 shadow hover:shadow-xl hover:-translate-y-1 active:scale-[0.98] transition-all duration-200 cursor-pointer block"
-          >
-            <div className="flex items-start justify-between mb-3">
-              <div className="w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-950/60 flex items-center justify-center text-2xl shadow-sm group-hover:scale-110 transition-transform">
-                🏢
-              </div>
-              <span className="text-purple-500 group-hover:translate-x-1 transition-transform text-base font-bold">
-                →
-              </span>
-            </div>
-            <h3 className="text-base font-bold text-gray-800 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
-              Reimbursement
-            </h3>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              Klaim biaya & export laporan
-            </p>
-          </Link>
-        </div>
+        <nav aria-labelledby="menu-utama" className="mb-8">
+          <h2 id="menu-utama" className="text-lg font-semibold mb-3">Menu utama</h2>
+          <ul className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+            {MENU_ITEMS.map(({ href, label, description, Icon }) => (
+              <li key={href}>
+                <Link
+                  href={href}
+                  className={`${PANEL} flex h-full flex-col sm:flex-row sm:items-start gap-2 sm:gap-3 p-4 hover:border-accent transition-colors`}
+                >
+                  <Icon aria-hidden="true" className="size-6 shrink-0 text-accent" />
+                  <span className="min-w-0">
+                    <span className="block font-semibold">{label}</span>
+                    <span className="block text-sm text-ink-muted mt-0.5">{description}</span>
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
 
         {/* Recent Transactions */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-gray-800 dark:text-white">
-              Transaksi Terakhir
-            </h2>
-            <Link
-              href="/transaksi"
-              className="text-blue-600 hover:text-blue-700 text-sm font-medium"
-            >
-              Lihat Semua →
+        <section aria-labelledby="transaksi-terakhir" className={`${PANEL} p-6`}>
+          <div className="flex items-baseline justify-between gap-4 mb-2">
+            <h2 id="transaksi-terakhir" className="text-lg font-semibold">Transaksi terakhir</h2>
+            <Link href="/transaksi" className="text-sm font-medium text-accent hover:text-accent-hover whitespace-nowrap">
+              Lihat semua
             </Link>
           </div>
-          
+
           {transactions.length === 0 ? (
-            <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-              <p className="text-4xl mb-2">📝</p>
-              <p>Belum ada transaksi</p>
-              <p className="text-sm mt-2">Gunakan tombol "Tambah Cepat" di kanan bawah!</p>
-            </div>
+            <p className="py-6 text-ink-muted">
+              Belum ada transaksi. Pilih Tambah Cepat di kanan bawah untuk mencatat yang pertama.
+            </p>
           ) : (
-            <div className="space-y-3">
+            <ul className="divide-y divide-gray-200 dark:divide-gray-700">
               {transactions.map((transaction) => (
-                <div
-                  key={transaction.id}
-                  className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="text-2xl">{transaction.category.icon || '📦'}</div>
-                    <div>
-                      <p className="font-semibold text-gray-800 dark:text-white">
-                        {transaction.description}
-                      </p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                <li key={transaction.id} className="flex items-center justify-between gap-4 py-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span aria-hidden="true" className="text-2xl">{transaction.category.icon || '📦'}</span>
+                    <div className="min-w-0">
+                      <p className="font-medium break-words">{transaction.description}</p>
+                      <p className="text-sm text-ink-muted">
                         {transaction.category.name}
-                        {transaction.savingsLocation && ` • ${transaction.savingsLocation}`}
-                        {' • '}
+                        {transaction.savingsLocation && `, ${transaction.savingsLocation}`}
+                        {', '}
                         {new Date(transaction.date).toLocaleDateString('id-ID')}
                       </p>
                     </div>
                   </div>
-                  <div className="text-right">
-                    {transaction.income > 0 ? (
-                      <p className="font-bold text-green-600">
-                        +{formatCurrency(transaction.income)}
-                      </p>
-                    ) : (
-                      <p className="font-bold text-red-600">
-                        -{formatCurrency(transaction.expense)}
-                      </p>
-                    )}
-                  </div>
-                </div>
+                  {transaction.income > 0 ? (
+                    <p className="font-semibold text-income whitespace-nowrap">
+                      +{formatCurrency(transaction.income)}
+                    </p>
+                  ) : (
+                    <p className="font-semibold text-expense whitespace-nowrap">
+                      -{formatCurrency(transaction.expense)}
+                    </p>
+                  )}
+                </li>
               ))}
-            </div>
+            </ul>
           )}
-        </div>
+        </section>
 
-        {/* Status */}
-        <div className="mt-8 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 rounded-full shadow">
-            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-            <span className="text-sm text-gray-600 dark:text-gray-300">
-              Database terhubung • {categories.length} kategori tersedia
-            </span>
-          </div>
-        </div>
-
-        {/* Quick Add Button - Floating */}
+        <DatabaseStatusToast categoryCount={categories.length} />
         <QuickAddTransaction />
       </div>
     </div>

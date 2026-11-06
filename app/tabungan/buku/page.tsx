@@ -171,14 +171,14 @@ export default function BukuTabunganPage() {
   const transactions = passbook?.transactions || []
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4 md:p-8">
+    <div className="min-h-screen bg-paper p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6 print:mb-4">
           <div>
             <Link 
               href="/tabungan"
-              className="text-blue-600 hover:text-blue-700 dark:text-blue-400 text-sm mb-2 inline-flex items-center gap-1 font-medium print:hidden"
+              className="text-accent hover:text-accent-hover text-sm mb-2 inline-flex items-center gap-1 font-medium print:hidden"
             >
               ← Kembali ke Dashboard Tabungan
             </Link>
@@ -192,18 +192,18 @@ export default function BukuTabunganPage() {
         </div>
 
         {/* Filters */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 mb-6 print:hidden">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-6 print:hidden">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex flex-wrap items-center gap-4">
               {/* Account Filter */}
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2 max-w-full">
                 <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                   Rekening:
                 </label>
                 <select
                   value={selectedLocation}
                   onChange={(e) => setSelectedLocation(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white text-sm font-medium focus:ring-2 focus:ring-blue-500"
+                  className="max-w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white text-sm font-medium focus:ring-2 focus:ring-accent"
                 >
                   <option value="all">🌐 Semua Akun (Kas Tunai & Bank)</option>
                   <option value="savings">🏦 Semua Rekening Bank Saja</option>
@@ -247,7 +247,7 @@ export default function BukuTabunganPage() {
                 type="button"
                 onClick={handleExportExcel}
                 disabled={exportingExcel || loading}
-                className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-400 text-white rounded-lg font-medium transition-colors flex items-center gap-1.5 text-sm shadow cursor-pointer"
+                className="px-3.5 py-2 bg-income-solid hover:bg-income-solid-hover disabled:bg-gray-400 text-white rounded-lg font-medium transition-colors flex items-center gap-1.5 text-sm shadow cursor-pointer"
                 title="Download mutasi buku tabungan format Excel (.xlsx)"
               >
                 <span>📊</span>
@@ -258,7 +258,7 @@ export default function BukuTabunganPage() {
                 type="button"
                 onClick={handleExportPdf}
                 disabled={exportingPdf || loading}
-                className="px-3.5 py-2 bg-rose-600 hover:bg-rose-700 disabled:bg-gray-400 text-white rounded-lg font-medium transition-colors flex items-center gap-1.5 text-sm shadow cursor-pointer"
+                className="px-3.5 py-2 bg-expense-solid hover:bg-expense-solid-hover disabled:bg-gray-400 text-white rounded-lg font-medium transition-colors flex items-center gap-1.5 text-sm shadow cursor-pointer"
                 title="Download mutasi buku tabungan format PDF (.pdf)"
               >
                 <span>📄</span>
@@ -268,7 +268,7 @@ export default function BukuTabunganPage() {
               <button
                 type="button"
                 onClick={handlePrint}
-                className="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors flex items-center gap-1.5 text-sm shadow cursor-pointer"
+                className="px-3.5 py-2 bg-brand-primary hover:bg-brand-primary-hover text-white rounded-lg font-medium transition-colors flex items-center gap-1.5 text-sm shadow cursor-pointer"
                 title="Buka dialog cetak browser"
               >
                 <span>🖨️</span>
@@ -279,22 +279,22 @@ export default function BukuTabunganPage() {
         </div>
 
         {/* Passbook Table */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden print:shadow-none border border-gray-200 dark:border-gray-700">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden print:shadow-none border border-gray-200 dark:border-gray-700">
           {/* Header Passbook */}
-          <div className="bg-gradient-to-r from-blue-700 to-indigo-700 text-white p-6 text-center print:bg-gray-800">
-            <div className="text-2xl font-mono tracking-widest opacity-60 mb-1">
+          <div className="bg-brand-primary text-white p-6 text-center print:bg-gray-800">
+            <div className="text-2xl tracking-widest opacity-60 mb-1">
               =============================================
             </div>
             <h2 className="text-xl font-bold tracking-wide print:text-lg">
               BUKU TABUNGAN & REKENING KORAN
             </h2>
-            <div className="inline-block mt-2 px-3 py-1 bg-white/20 rounded-full text-xs font-semibold tracking-wider">
+            <div className="inline-block mt-2 px-3 py-1 border border-white/60 rounded-full text-xs font-semibold tracking-wider">
               {getAccountTitle()}
             </div>
-            <p className="text-xs text-blue-100 mt-2">
+            <p className="text-xs text-white mt-2">
               Periode: {months.find(m => m.value === selectedMonth)?.label} {selectedYear}
             </p>
-            <div className="text-2xl font-mono tracking-widest opacity-60 mt-1">
+            <div className="text-2xl tracking-widest opacity-60 mt-1">
               =============================================
             </div>
           </div>
@@ -310,19 +310,19 @@ export default function BukuTabunganPage() {
               </div>
               <div className="p-3 bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700">
                 <span className="text-gray-500 dark:text-gray-400 block">Total Masuk (Kredit):</span>
-                <span className="font-bold text-green-600 text-sm">
+                <span className="font-bold text-income text-sm">
                   +{formatCurrency(passbook.totalCredit)}
                 </span>
               </div>
               <div className="p-3 bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700">
                 <span className="text-gray-500 dark:text-gray-400 block">Total Keluar (Debit):</span>
-                <span className="font-bold text-red-600 text-sm">
+                <span className="font-bold text-expense text-sm">
                   -{formatCurrency(passbook.totalDebit)}
                 </span>
               </div>
               <div className="p-3 bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700">
                 <span className="text-gray-500 dark:text-gray-400 block">Saldo Akhir:</span>
-                <span className="font-bold text-blue-600 dark:text-blue-400 text-sm">
+                <span className="font-bold text-accent text-sm">
                   {formatCurrency(passbook.endBalance)}
                 </span>
               </div>
@@ -330,17 +330,17 @@ export default function BukuTabunganPage() {
           )}
 
           {loading ? (
-            <div className="p-12 text-center text-gray-500">
+            <div className="p-12 text-center text-gray-500 dark:text-gray-400">
               <div className="text-4xl mb-2">📖</div>
               <p>Memuat mutasi buku tabungan...</p>
             </div>
           ) : transactions.length === 0 ? (
-            <div className="p-12 text-center text-gray-500">
+            <div className="p-12 text-center text-gray-500 dark:text-gray-400">
               <div className="text-6xl mb-4">📖</div>
               <p className="text-lg font-semibold mb-1 text-gray-700 dark:text-gray-300">
                 Tidak ada transaksi pada periode ini
               </p>
-              <p className="text-sm text-gray-400">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
                 Saldo Awal: {passbook ? formatCurrency(passbook.startBalance) : 'Rp 0'} • Saldo Akhir: {passbook ? formatCurrency(passbook.endBalance) : 'Rp 0'}
               </p>
             </div>
@@ -357,10 +357,10 @@ export default function BukuTabunganPage() {
                       <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                         Keterangan & Rekening
                       </th>
-                      <th className="px-4 py-3 text-right text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-wider">
+                      <th className="px-4 py-3 text-right text-xs font-bold text-expense uppercase tracking-wider">
                         Debit (Keluar)
                       </th>
-                      <th className="px-4 py-3 text-right text-xs font-bold text-green-600 dark:text-green-400 uppercase tracking-wider">
+                      <th className="px-4 py-3 text-right text-xs font-bold text-income uppercase tracking-wider">
                         Kredit (Masuk)
                       </th>
                       <th className="px-4 py-3 text-right text-xs font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wider">
@@ -376,7 +376,7 @@ export default function BukuTabunganPage() {
                           index % 2 === 0 
                             ? 'bg-white dark:bg-gray-800' 
                             : 'bg-gray-50/60 dark:bg-gray-800/50'
-                        } hover:bg-blue-50/50 dark:hover:bg-gray-700 transition-colors print:bg-white`}
+                        } hover:bg-status-info-light dark:hover:bg-gray-700 transition-colors print:bg-white`}
                       >
                         <td className="px-4 py-3 text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap">
                           {formatDate(t.date)}
@@ -389,30 +389,30 @@ export default function BukuTabunganPage() {
                                 {t.description}
                               </div>
                               <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                                Kategori: {t.category?.name} • Akun: <span className="font-semibold text-blue-600 dark:text-blue-400">{t.savingsLocation}</span>
+                                Kategori: {t.category?.name} • Akun: <span className="font-semibold text-accent">{t.savingsLocation}</span>
                               </div>
                             </div>
                           </div>
                         </td>
                         <td className="px-4 py-3 text-right whitespace-nowrap">
                           {t.debit > 0 ? (
-                            <span className="text-red-600 font-semibold font-mono text-sm">
+                            <span className="text-expense font-semibold text-sm">
                               -{formatCurrency(t.debit)}
                             </span>
                           ) : (
-                            <span className="text-gray-300 dark:text-gray-600">-</span>
+                            <span className="text-gray-500 dark:text-gray-400">-</span>
                           )}
                         </td>
                         <td className="px-4 py-3 text-right whitespace-nowrap">
                           {t.credit > 0 ? (
-                            <span className="text-green-600 font-semibold font-mono text-sm">
+                            <span className="text-income font-semibold text-sm">
                               +{formatCurrency(t.credit)}
                             </span>
                           ) : (
-                            <span className="text-gray-300 dark:text-gray-600">-</span>
+                            <span className="text-gray-500 dark:text-gray-400">-</span>
                           )}
                         </td>
-                        <td className="px-4 py-3 text-right font-bold text-gray-900 dark:text-gray-100 font-mono text-sm whitespace-nowrap">
+                        <td className="px-4 py-3 text-right font-bold text-gray-900 dark:text-gray-100 text-sm whitespace-nowrap">
                           {formatCurrency(t.runningBalance)}
                         </td>
                       </tr>
@@ -422,14 +422,14 @@ export default function BukuTabunganPage() {
               </div>
 
               {/* Footer */}
-              <div className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-600 p-6 border-t-2 border-gray-300 dark:border-gray-600 print:bg-gray-50">
+              <div className="bg-gray-100 dark:bg-gray-700 p-6 border-t-2 border-gray-300 dark:border-gray-600 print:bg-gray-50">
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                   <div className="text-sm font-semibold text-gray-600 dark:text-gray-300">
                     RINGKASAN AKHIR PERIODE ({months.find(m => m.value === selectedMonth)?.label} {selectedYear})
                   </div>
                   <div className="text-right">
                     <span className="text-xs text-gray-500 dark:text-gray-400 block mb-0.5">Saldo Akhir:</span>
-                    <span className="text-2xl font-bold text-blue-600 dark:text-blue-400 font-mono print:text-xl">
+                    <span className="text-2xl font-bold text-accent print:text-xl">
                       {passbook ? formatCurrency(passbook.endBalance) : 'Rp 0'}
                     </span>
                   </div>

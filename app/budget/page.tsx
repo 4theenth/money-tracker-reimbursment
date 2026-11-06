@@ -505,13 +505,13 @@ export default function BudgetPlanningPage() {
   const modalUnallocated = modalIncome - modalTotalExpenses
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4 md:p-8">
+    <div className="min-h-screen bg-paper p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-6">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-brand-primary hover:text-brand-primary-hover font-medium mb-4 transition-colors"
+            className="inline-flex items-center gap-2 text-accent hover:text-accent-hover font-medium mb-4 transition-colors"
           >
             ← Kembali ke Dashboard
           </Link>
@@ -543,7 +543,7 @@ export default function BudgetPlanningPage() {
                 type="button"
                 onClick={handleOpenEditModal}
                 disabled={loading}
-                className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm transition-all shadow-lg flex items-center gap-2 disabled:opacity-50"
+                className="px-4 py-2.5 bg-brand-primary hover:bg-brand-primary-hover text-white rounded-lg font-semibold text-sm transition-all shadow-sm flex items-center gap-2 disabled:opacity-50"
               >
                 <span>🎯</span>
                 <span>Atur Target Anggaran</span>
@@ -553,7 +553,7 @@ export default function BudgetPlanningPage() {
         </div>
 
         {/* Filter Bar */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 mb-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-6">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex flex-wrap items-center gap-4">
               <div className="flex items-center gap-2">
@@ -563,7 +563,7 @@ export default function BudgetPlanningPage() {
                 <select
                   value={selectedMonth}
                   onChange={(e) => setSelectedMonth(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white text-sm font-medium focus:ring-2 focus:ring-blue-500"
+                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white text-sm font-medium focus:ring-2 focus:ring-accent"
                 >
                   {months.map((m) => (
                     <option key={m.value} value={m.value}>
@@ -574,7 +574,7 @@ export default function BudgetPlanningPage() {
                 <select
                   value={selectedYear}
                   onChange={(e) => setSelectedYear(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white text-sm font-medium focus:ring-2 focus:ring-blue-500"
+                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white text-sm font-medium focus:ring-2 focus:ring-accent"
                 >
                   {years.map((y) => (
                     <option key={y} value={y}>
@@ -589,13 +589,13 @@ export default function BudgetPlanningPage() {
             {data && (
               <div className="flex items-center gap-2">
                 {data.period.isConfigured ? (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
-                    <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-status-success-light text-income bg-status-success-light">
+                    <span className="w-2 h-2 rounded-full bg-income"></span>
                     Target Anggaran Aktif
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
-                    <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-status-warning-light text-caution bg-status-warning-light">
+                    <span className="w-2 h-2 rounded-full bg-caution"></span>
                     Belum Dikonfigurasi
                   </span>
                 )}
@@ -605,8 +605,8 @@ export default function BudgetPlanningPage() {
         </div>
 
         {loading ? (
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-16 text-center text-gray-500">
-            <div className="text-5xl mb-3 animate-bounce">🎯</div>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-16 text-center text-gray-500 dark:text-gray-400">
+            <div className="text-5xl mb-3">🎯</div>
             <p className="text-lg font-medium">Memuat data anggaran...</p>
           </div>
         ) : !data ? null : (
@@ -614,16 +614,16 @@ export default function BudgetPlanningPage() {
             {/* Top Summary Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
               {/* Card 1: Target Pendapatan */}
-              <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg shadow-lg p-5 text-white">
+              <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-emerald-100 text-xs font-medium uppercase tracking-wider mb-1">
+                    <p className="text-ink-muted text-xs font-medium mb-1">
                       Target Pendapatan
                     </p>
                     <p className="text-2xl font-bold">
                       {formatCurrency(data.targetIncome)}
                     </p>
-                    <p className="text-emerald-100 text-xs mt-2">
+                    <p className="text-ink-muted text-xs mt-2">
                       Realisasi: <span className="font-semibold">{formatCurrency(data.actualIncome)}</span>
                     </p>
                   </div>
@@ -632,16 +632,16 @@ export default function BudgetPlanningPage() {
               </div>
 
               {/* Card 2: Total Target Belanja */}
-              <div className="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-lg shadow-lg p-5 text-white">
+              <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-indigo-100 text-xs font-medium uppercase tracking-wider mb-1">
+                    <p className="text-ink-muted text-xs font-medium mb-1">
                       Total Target Belanja
                     </p>
                     <p className="text-2xl font-bold">
                       {formatCurrency(data.totalTargetExpense)}
                     </p>
-                    <p className="text-indigo-100 text-xs mt-2">
+                    <p className="text-ink-muted text-xs mt-2">
                       Realisasi: <span className="font-semibold">{formatCurrency(data.totalActualExpense)}</span>
                     </p>
                   </div>
@@ -651,21 +651,21 @@ export default function BudgetPlanningPage() {
 
               {/* Card 3: Sisa Kuota Belanja */}
               <div
-                className={`bg-gradient-to-br ${
+                className={`bg-white dark:bg-gray-800 border ${
                   data.totalExpenseDifference >= 0
-                    ? 'from-blue-500 to-blue-600'
-                    : 'from-rose-500 to-rose-600'
-                } rounded-lg shadow-lg p-5 text-white`}
+                    ? 'border-gray-200 dark:border-gray-700'
+                    : 'border-expense/30'
+                } rounded-lg p-5`}
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-blue-100 text-xs font-medium uppercase tracking-wider mb-1">
+                    <p className="text-ink-muted text-xs font-medium mb-1">
                       {data.totalExpenseDifference >= 0 ? 'Sisa Kuota Belanja' : 'Defisit Anggaran'}
                     </p>
-                    <p className="text-2xl font-bold">
+                    <p className={`text-2xl font-bold ${data.totalExpenseDifference >= 0 ? 'text-income' : 'text-expense'}`}>
                       {formatCurrency(Math.abs(data.totalExpenseDifference))}
                     </p>
-                    <p className="text-blue-100 text-xs mt-2">
+                    <p className="text-ink-muted text-xs mt-2">
                       {data.totalExpenseDifference >= 0
                         ? `Terpakai ${data.totalExpensePercentage}% dari target`
                         : `Overbudget sebesar ${data.totalExpensePercentage}%!`}
@@ -678,31 +678,31 @@ export default function BudgetPlanningPage() {
               </div>
 
               {/* Card 4: Sisa Budget Bebas (Unallocated) */}
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-5 border border-gray-200 dark:border-gray-700">
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-5 border border-gray-200 dark:border-gray-700">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-gray-500 dark:text-gray-400 text-xs font-medium uppercase tracking-wider mb-1">
+                    <p className="text-gray-500 dark:text-gray-400 text-xs font-medium mb-1">
                       Sisa Budget Bebas
                     </p>
                     <p
                       className={`text-2xl font-bold ${
                         data.unallocatedBudget >= 0
                           ? 'text-gray-800 dark:text-white'
-                          : 'text-rose-600 dark:text-rose-400'
+                          : 'text-expense'
                       }`}
                     >
                       {formatCurrency(data.unallocatedBudget)}
                     </p>
                     <div className="flex items-center gap-1.5 mt-2 text-xs font-medium">
-                      <span className="text-green-600 dark:text-green-400">
+                      <span className="text-income">
                         🟢 {data.statusCounts.ok} OK
                       </span>
                       <span>•</span>
-                      <span className="text-amber-600 dark:text-amber-400">
+                      <span className="text-caution">
                         🟡 {data.statusCounts.alert} Alert
                       </span>
                       <span>•</span>
-                      <span className="text-rose-600 dark:text-rose-400">
+                      <span className="text-expense">
                         🔴 {data.statusCounts.over} Over
                       </span>
                     </div>
@@ -713,7 +713,7 @@ export default function BudgetPlanningPage() {
             </div>
 
             {/* Overall Progress Bar */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
               <div className="flex items-center justify-between mb-2">
                 <div>
                   <h2 className="text-base font-bold text-gray-800 dark:text-white">
@@ -726,12 +726,12 @@ export default function BudgetPlanningPage() {
                 </div>
                 <div className="text-right">
                   <span
-                    className={`text-2xl font-bold font-mono ${
+                    className={`text-2xl font-bold ${
                       data.totalExpensePercentage > 100
-                        ? 'text-rose-600 dark:text-rose-400'
+                        ? 'text-expense'
                         : data.totalExpensePercentage >= 80
-                        ? 'text-amber-600 dark:text-amber-400'
-                        : 'text-emerald-600 dark:text-emerald-400'
+                        ? 'text-caution'
+                        : 'text-income'
                     }`}
                   >
                     {data.totalExpensePercentage}%
@@ -744,10 +744,10 @@ export default function BudgetPlanningPage() {
                 <div
                   className={`h-full transition-all duration-500 rounded-full ${
                     data.totalExpensePercentage > 100
-                      ? 'bg-rose-500 animate-pulse'
+                      ? 'bg-expense'
                       : data.totalExpensePercentage >= 80
-                      ? 'bg-amber-500'
-                      : 'bg-emerald-500'
+                      ? 'bg-caution'
+                      : 'bg-income'
                   }`}
                   style={{
                     width: `${Math.min(data.totalExpensePercentage, 100)}%`,
@@ -757,7 +757,7 @@ export default function BudgetPlanningPage() {
             </div>
 
             {/* Comparison Table */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700 mb-8">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden border border-gray-200 dark:border-gray-700 mb-8">
               <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                 <div>
                   <h2 className="text-lg font-bold text-gray-800 dark:text-white">
@@ -769,15 +769,15 @@ export default function BudgetPlanningPage() {
                 </div>
                 <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-3">
                   <span className="flex items-center gap-1">
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>
+                    <span className="w-2.5 h-2.5 rounded-full bg-income inline-block"></span>
                     ≤ 80% (Aman)
                   </span>
                   <span className="flex items-center gap-1">
-                    <span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block"></span>
+                    <span className="w-2.5 h-2.5 rounded-full bg-caution inline-block"></span>
                     80-100% (Waspada)
                   </span>
                   <span className="flex items-center gap-1">
-                    <span className="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"></span>
+                    <span className="w-2.5 h-2.5 rounded-full bg-expense inline-block"></span>
                     &gt; 100% (Overbudget)
                   </span>
                 </div>
@@ -804,7 +804,7 @@ export default function BudgetPlanningPage() {
                           index % 2 === 0
                             ? 'bg-white dark:bg-gray-800'
                             : 'bg-gray-50/60 dark:bg-gray-800/50'
-                        } hover:bg-blue-50/40 dark:hover:bg-gray-700 transition-colors`}
+                        } hover:bg-status-info-light dark:hover:bg-gray-700 transition-colors`}
                       >
                         {/* Kategori */}
                         <td className="px-4 py-3.5">
@@ -823,33 +823,33 @@ export default function BudgetPlanningPage() {
                           {item.targetAmount > 0 ? (
                             formatCurrency(item.targetAmount)
                           ) : (
-                            <span className="text-gray-400 dark:text-gray-500 italic text-xs">
+                            <span className="text-gray-500 dark:text-gray-400 italic text-xs">
                               Tidak diatur
                             </span>
                           )}
                         </td>
 
                         {/* Actual */}
-                        <td className="px-4 py-3.5 text-right font-semibold font-mono text-gray-900 dark:text-gray-100">
+                        <td className="px-4 py-3.5 text-right font-semibold text-gray-900 dark:text-gray-100">
                           {item.actualAmount > 0 ? (
                             formatCurrency(item.actualAmount)
                           ) : (
-                            <span className="text-gray-400 dark:text-gray-600 font-normal">-</span>
+                            <span className="text-gray-500 dark:text-gray-400 font-normal">-</span>
                           )}
                         </td>
 
                         {/* Sisa Kuota */}
-                        <td className="px-4 py-3.5 text-right font-mono text-sm">
+                        <td className="px-4 py-3.5 text-right text-sm">
                           {item.difference < 0 ? (
-                            <span className="text-rose-600 dark:text-rose-400 font-bold">
+                            <span className="text-expense font-bold">
                               -{formatCurrency(Math.abs(item.difference))}
                             </span>
                           ) : item.targetAmount > 0 ? (
-                            <span className="text-emerald-600 dark:text-emerald-400 font-medium">
+                            <span className="text-income font-medium">
                               +{formatCurrency(item.difference)}
                             </span>
                           ) : (
-                            <span className="text-gray-400 dark:text-gray-500">-</span>
+                            <span className="text-gray-500 dark:text-gray-400">-</span>
                           )}
                         </td>
 
@@ -857,10 +857,10 @@ export default function BudgetPlanningPage() {
                         <td className="px-4 py-3.5">
                           <div className="space-y-1">
                             <div className="flex items-center justify-between text-xs">
-                              <span className="font-mono font-semibold text-gray-700 dark:text-gray-300">
+                              <span className="font-semibold text-gray-700 dark:text-gray-300">
                                 {item.percentage}%
                               </span>
-                              <span className="text-[11px] text-gray-500">
+                              <span className="text-[11px] text-gray-500 dark:text-gray-400">
                                 {item.targetAmount > 0 ? 'dari target' : 'tanpa target'}
                               </span>
                             </div>
@@ -868,10 +868,10 @@ export default function BudgetPlanningPage() {
                               <div
                                 className={`h-full rounded-full transition-all duration-300 ${
                                   item.status === 'OVER'
-                                    ? 'bg-rose-500'
+                                    ? 'bg-expense'
                                     : item.status === 'ALERT'
-                                    ? 'bg-amber-500'
-                                    : 'bg-emerald-500'
+                                    ? 'bg-caution'
+                                    : 'bg-income'
                                 }`}
                                 style={{
                                   width: `${Math.min(item.percentage, 100)}%`,
@@ -884,17 +884,17 @@ export default function BudgetPlanningPage() {
                         {/* Status Badge */}
                         <td className="px-4 py-3.5 text-center whitespace-nowrap">
                           {item.status === 'OVER' ? (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300 border border-rose-200 dark:border-rose-800">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-status-danger-light text-expense bg-status-danger-light border border-expense/30">
                               <span>🔴</span>
                               <span>OVER</span>
                             </span>
                           ) : item.status === 'ALERT' ? (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-status-warning-light text-caution bg-status-warning-light border border-caution/30">
                               <span>🟡</span>
                               <span>ALERT</span>
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-status-success-light text-income bg-status-success-light border border-income/30">
                               <span>🟢</span>
                               <span>OK</span>
                             </span>
@@ -907,7 +907,7 @@ export default function BudgetPlanningPage() {
                             <button
                               type="button"
                               onClick={() => handleQuickEditTarget(item)}
-                              className="p-1.5 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950/50 rounded-lg transition-colors cursor-pointer"
+                              className="p-1.5 text-accent hover:text-accent-hover hover:text-accent-hover hover:bg-status-info-light hover:bg-status-info-light rounded-lg transition-colors cursor-pointer"
                               title={`Ubah target anggaran ${item.categoryName}`}
                             >
                               <span className="text-sm">✏️</span>
@@ -916,7 +916,7 @@ export default function BudgetPlanningPage() {
                             <button
                               type="button"
                               onClick={() => handleRequestRemoveCategory(item)}
-                              className="p-1.5 text-rose-500 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-950/50 rounded-lg transition-colors cursor-pointer"
+                              className="p-1.5 text-expense hover:text-expense hover:bg-status-danger-light hover:bg-status-danger-light rounded-lg transition-colors cursor-pointer"
                               title={`Kurangi / Hapus ${item.categoryName}`}
                             >
                               <span className="text-sm">🗑️</span>
@@ -936,21 +936,21 @@ export default function BudgetPlanningPage() {
                       <td className="px-4 py-3.5 text-right text-gray-800 dark:text-white">
                         {formatCurrency(data.totalTargetExpense)}
                       </td>
-                      <td className="px-4 py-3.5 text-right font-mono text-gray-900 dark:text-gray-100">
+                      <td className="px-4 py-3.5 text-right text-gray-900 dark:text-gray-100">
                         {formatCurrency(data.totalActualExpense)}
                       </td>
                       <td
-                        className={`px-4 py-3.5 text-right font-mono ${
+                        className={`px-4 py-3.5 text-right ${
                           data.totalExpenseDifference >= 0
-                            ? 'text-emerald-600 dark:text-emerald-400'
-                            : 'text-rose-600 dark:text-rose-400'
+                            ? 'text-income'
+                            : 'text-expense'
                         }`}
                       >
                         {data.totalExpenseDifference >= 0 ? '+' : '-'}
                         {formatCurrency(Math.abs(data.totalExpenseDifference))}
                       </td>
                       <td className="px-4 py-3.5">
-                        <span className="font-mono text-gray-800 dark:text-gray-200">{data.totalExpensePercentage}% Terpakai</span>
+                        <span className="text-gray-800 dark:text-gray-200">{data.totalExpensePercentage}% Terpakai</span>
                       </td>
                       <td className="px-4 py-3.5 text-center">
                         <span className="text-xs text-gray-600 dark:text-gray-300 font-semibold">
@@ -980,8 +980,8 @@ export default function BudgetPlanningPage() {
           </p>
 
           {/* Target Income Input */}
-          <div className="bg-emerald-50 dark:bg-emerald-950/30 p-4 rounded-lg border border-emerald-200 dark:border-emerald-800">
-            <label className="block text-sm font-bold text-emerald-800 dark:text-emerald-300 mb-1">
+          <div className="bg-status-success-light bg-status-success-light p-4 rounded-lg border border-income/30">
+            <label className="block text-sm font-bold text-income mb-1">
               Target Pendapatan Bulanan (Rp) <span className="text-status-danger font-bold">*</span>
             </label>
             <input
@@ -992,9 +992,9 @@ export default function BudgetPlanningPage() {
               min="0"
               step="1000"
               required
-              className="w-full px-3 py-2 text-base font-semibold border border-emerald-300 dark:border-emerald-700 rounded-lg dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-emerald-500"
+              className="w-full px-3 py-2 text-base font-semibold border border-income/30 rounded-lg dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-income"
             />
-            <p className="text-xs text-emerald-700 dark:text-emerald-400 mt-1">
+            <p className="text-xs text-income mt-1">
               Total estimasi gaji, bonus, dan pemasukan bulan ini
             </p>
           </div>
@@ -1008,7 +1008,7 @@ export default function BudgetPlanningPage() {
               <button
                 type="button"
                 onClick={() => setIsAddingCategory(!isAddingCategory)}
-                className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center gap-1 transition-colors px-2.5 py-1 rounded-md bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800"
+                className="text-xs font-semibold text-accent hover:text-accent-hover hover:text-accent-hover flex items-center gap-1 transition-colors px-2.5 py-1 rounded-md bg-status-info-light bg-status-info-light border border-accent/30"
               >
                 <span>{isAddingCategory ? '✕ Tutup Form' : '+ Tambah Kategori Baru'}</span>
               </button>
@@ -1016,9 +1016,9 @@ export default function BudgetPlanningPage() {
 
             {/* Inline Add Category Form */}
             {isAddingCategory && (
-              <div className="mb-3 p-3.5 bg-blue-50/70 dark:bg-gray-800/90 rounded-lg border-2 border-blue-200 dark:border-blue-700/60 animate-fadeIn">
+              <div className="mb-3 p-3.5 bg-status-info-light dark:bg-gray-800/90 rounded-lg border-2 border-accent/30 animate-fadeIn">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-bold text-blue-900 dark:text-blue-300 flex items-center gap-1.5">
+                  <span className="text-xs font-bold text-accent flex items-center gap-1.5">
                     <span>🏷️</span>
                     <span>Buat Pos Belanja Baru</span>
                   </span>
@@ -1037,7 +1037,7 @@ export default function BudgetPlanningPage() {
                       value={newCategoryName}
                       onChange={(e) => setNewCategoryName(e.target.value)}
                       placeholder="Contoh: Skincare, Cicilan, Kado"
-                      className="w-full px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-accent"
                       autoFocus
                     />
                   </div>
@@ -1054,7 +1054,7 @@ export default function BudgetPlanningPage() {
                           onClick={() => setNewCategoryIcon(emoji)}
                           className={`text-xl p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
                             newCategoryIcon === emoji
-                              ? 'bg-blue-100 dark:bg-blue-900/60 ring-2 ring-blue-500'
+                              ? 'bg-status-info-light bg-status-info-light ring-2 ring-accent'
                               : ''
                           }`}
                         >
@@ -1077,7 +1077,7 @@ export default function BudgetPlanningPage() {
                       type="button"
                       onClick={handleCreateCategory}
                       disabled={addingCategory || !newCategoryName.trim()}
-                      className="px-3.5 py-1.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded-lg transition-colors flex items-center gap-1 shadow-sm"
+                      className="px-3.5 py-1.5 text-xs font-semibold text-white bg-brand-primary hover:bg-brand-primary-hover disabled:opacity-50 rounded-lg transition-colors flex items-center gap-1 shadow-sm"
                     >
                       <span>{addingCategory ? 'Menyimpan...' : '✓ Simpan & Masukkan ke Anggaran'}</span>
                     </button>
@@ -1098,7 +1098,7 @@ export default function BudgetPlanningPage() {
                     <span className="font-semibold text-gray-700 dark:text-gray-300">
                       Kategori yang belum masuk anggaran bulan ini:
                     </span>
-                    <span className="text-[11px] text-gray-400">Klik untuk menambahkan</span>
+                    <span className="text-[11px] text-gray-500 dark:text-gray-400">Klik untuk menambahkan</span>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     {unbudgeted.map((c) => (
@@ -1106,12 +1106,12 @@ export default function BudgetPlanningPage() {
                         key={c.id}
                         type="button"
                         onClick={() => handleAddExistingCategory(c)}
-                        className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-md bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 text-gray-800 dark:text-gray-200 transition-colors shadow-sm cursor-pointer"
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-md bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 hover:border-accent hover:text-accent-hover hover:text-accent-hover text-gray-800 dark:text-gray-200 transition-colors shadow-sm cursor-pointer"
                         title={`Tambahkan ${c.name} ke anggaran`}
                       >
                         <span>{c.icon || '📦'}</span>
                         <span>{c.name}</span>
-                        <span className="text-blue-500 font-bold ml-0.5">+</span>
+                        <span className="text-accent font-bold ml-0.5">+</span>
                       </button>
                     ))}
                   </div>
@@ -1123,18 +1123,18 @@ export default function BudgetPlanningPage() {
               {modalItems.map((item) => (
                 <div
                   key={item.categoryId}
-                  className="flex items-center justify-between gap-3 p-2.5 bg-gray-50 dark:bg-gray-700/60 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm"
+                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3 p-2.5 bg-gray-50 dark:bg-gray-700/60 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm"
                 >
-                  <div className="flex items-center gap-2 min-w-[140px]">
+                  <div className="flex items-center gap-2 sm:min-w-[140px]">
                     <span className="text-2xl">{item.categoryIcon || '📦'}</span>
                     <span className="text-sm font-semibold text-gray-800 dark:text-white">
                       {item.categoryName}
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-1.5 flex-1 max-w-[240px] justify-end">
+                  <div className="flex items-center gap-1.5 w-full sm:w-auto sm:flex-1 sm:max-w-[240px] justify-end">
                     <div className="relative flex-1">
-                      <span className="absolute left-3 top-2 text-xs text-gray-400 font-semibold">
+                      <span className="absolute left-3 top-2 text-xs text-gray-500 dark:text-gray-400 font-semibold">
                         Rp
                       </span>
                       <input
@@ -1146,14 +1146,14 @@ export default function BudgetPlanningPage() {
                         placeholder="0"
                         min="0"
                         step="1000"
-                        className="w-full pl-9 pr-3 py-1.5 text-sm font-mono font-medium border border-gray-300 dark:border-gray-500 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 text-right"
+                        className="w-full pl-9 pr-3 py-1.5 text-sm font-medium border border-gray-300 dark:border-gray-500 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-accent text-right"
                       />
                     </div>
 
                     <button
                       type="button"
                       onClick={() => handleRequestRemoveCategory(item)}
-                      className="p-1.5 text-gray-400 hover:text-rose-500 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition-colors cursor-pointer"
+                      className="p-1.5 text-gray-500 dark:text-gray-400 hover:text-expense hover:bg-status-danger-light hover:bg-status-danger-light rounded-lg transition-colors cursor-pointer"
                       title={`Kurangi / Hapus ${item.categoryName}`}
                     >
                       <span className="text-base">🗑️</span>
@@ -1168,17 +1168,17 @@ export default function BudgetPlanningPage() {
           <div className="bg-gray-100 dark:bg-gray-900/80 p-3.5 rounded-lg text-xs space-y-1.5 border border-gray-300 dark:border-gray-700">
             <div className="flex justify-between">
               <span className="text-gray-600 dark:text-gray-300 font-medium">Total Alokasi Belanja:</span>
-              <span className="font-bold font-mono text-gray-900 dark:text-white">
+              <span className="font-bold text-gray-900 dark:text-white">
                 {formatCurrency(modalTotalExpenses)}
               </span>
             </div>
             <div className="flex justify-between border-t border-gray-200 dark:border-gray-700 pt-1.5">
               <span className="text-gray-600 dark:text-gray-300 font-medium">Sisa Budget Bebas:</span>
               <span
-                className={`font-bold font-mono ${
+                className={`font-bold ${
                   modalUnallocated >= 0
-                    ? 'text-emerald-600 dark:text-emerald-400'
-                    : 'text-rose-600 dark:text-rose-400'
+                    ? 'text-income'
+                    : 'text-expense'
                 }`}
               >
                 {formatCurrency(modalUnallocated)}
@@ -1199,7 +1199,7 @@ export default function BudgetPlanningPage() {
             <button
               type="submit"
               disabled={saving}
-              className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors disabled:opacity-50 text-sm shadow"
+              className="flex-1 px-4 py-2 bg-brand-primary hover:bg-brand-primary-hover text-white rounded-lg font-semibold transition-colors disabled:opacity-50 text-sm shadow"
             >
               {saving ? 'Menyimpan...' : 'Simpan Anggaran'}
             </button>
@@ -1233,21 +1233,21 @@ export default function BudgetPlanningPage() {
 
           <div className="space-y-3 pt-1">
             {/* Pilihan 1: Keluarkan dari Bulan Ini */}
-            <div className="p-3.5 rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-950/20 hover:border-blue-400 dark:hover:border-blue-700 transition-colors">
+            <div className="p-3.5 rounded-lg border border-accent/30 bg-status-info-light bg-status-info-light hover:border-accent dark:hover:border-accent/30 transition-colors">
               <div className="flex items-start justify-between gap-3">
                 <div className="space-y-1">
-                  <h5 className="text-sm font-bold text-blue-900 dark:text-blue-300 flex items-center gap-1.5">
+                  <h5 className="text-sm font-bold text-accent flex items-center gap-1.5">
                     <span>🗓️</span>
                     <span>Keluarkan dari Anggaran Bulan Ini Saja</span>
                   </h5>
-                  <p className="text-xs text-blue-700 dark:text-blue-400/90 leading-relaxed">
+                  <p className="text-xs text-accent leading-relaxed">
                     Pos ini tidak akan ditargetkan pada bulan {data?.period.label}. Kategori master tetap aman di sistem dan tetap bisa dipakai transaksi harian.
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={handleExcludeFromMonth}
-                  className="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold whitespace-nowrap shadow-sm transition-colors cursor-pointer"
+                  className="px-3.5 py-1.5 bg-brand-primary hover:bg-brand-primary-hover text-white rounded-lg text-xs font-semibold whitespace-nowrap shadow-sm transition-colors cursor-pointer"
                 >
                   Keluarkan
                 </button>
@@ -1255,14 +1255,14 @@ export default function BudgetPlanningPage() {
             </div>
 
             {/* Pilihan 2: Hapus dari Seluruh Sistem */}
-            <div className="p-3.5 rounded-lg border border-rose-200 dark:border-rose-800 bg-rose-50/50 dark:bg-rose-950/20 hover:border-rose-400 dark:hover:border-rose-700 transition-colors">
+            <div className="p-3.5 rounded-lg border border-expense/30 bg-status-danger-light bg-status-danger-light hover:border-expense dark:hover:border-expense/30 transition-colors">
               <div className="flex items-start justify-between gap-3">
                 <div className="space-y-1">
-                  <h5 className="text-sm font-bold text-rose-900 dark:text-rose-300 flex items-center gap-1.5">
+                  <h5 className="text-sm font-bold text-expense flex items-center gap-1.5">
                     <span>⚠️</span>
                     <span>Hapus / Nonaktifkan dari Seluruh Sistem</span>
                   </h5>
-                  <p className="text-xs text-rose-700 dark:text-rose-400/90 leading-relaxed">
+                  <p className="text-xs text-expense leading-relaxed">
                     Menonaktifkan kategori ini secara global dari aplikasi. Kategori tidak akan muncul lagi di formulir transaksi maupun anggaran mana pun.
                   </p>
                 </div>
@@ -1270,7 +1270,7 @@ export default function BudgetPlanningPage() {
                   type="button"
                   onClick={handleDeactivateGlobally}
                   disabled={deletingGlobally}
-                  className="px-3.5 py-1.5 bg-rose-600 hover:bg-rose-700 disabled:opacity-50 text-white rounded-lg text-xs font-semibold whitespace-nowrap shadow-sm transition-colors cursor-pointer"
+                  className="px-3.5 py-1.5 bg-expense-solid hover:bg-expense-solid-hover disabled:opacity-50 text-white rounded-lg text-xs font-semibold whitespace-nowrap shadow-sm transition-colors cursor-pointer"
                 >
                   {deletingGlobally ? 'Menghapus...' : 'Hapus Global'}
                 </button>
@@ -1312,7 +1312,7 @@ export default function BudgetPlanningPage() {
                   </h4>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
                     Realisasi Belanja Saat Ini:{' '}
-                    <span className="font-semibold font-mono text-gray-700 dark:text-gray-300">
+                    <span className="font-semibold text-gray-700 dark:text-gray-300">
                       {formatCurrency(quickEditItem.actualAmount)}
                     </span>
                   </p>
@@ -1325,7 +1325,7 @@ export default function BudgetPlanningPage() {
                 Target Budget Baru (Rp) <span className="text-status-danger font-bold">*</span>
               </label>
               <div className="relative">
-                <span className="absolute left-3 top-2.5 text-sm text-gray-400 font-semibold">
+                <span className="absolute left-3 top-2.5 text-sm text-gray-500 dark:text-gray-400 font-semibold">
                   Rp
                 </span>
                 <input
@@ -1337,10 +1337,10 @@ export default function BudgetPlanningPage() {
                   step="1000"
                   autoFocus
                   required
-                  className="w-full pl-10 pr-3 py-2 text-base font-mono font-semibold border border-gray-300 dark:border-gray-500 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                  className="w-full pl-10 pr-3 py-2 text-base font-semibold border border-gray-300 dark:border-gray-500 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-accent"
                 />
               </div>
-              <p className="text-[11px] text-gray-400 mt-1">
+              <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-1">
                 Isi 0 jika tidak ingin menetapkan batas pengeluaran untuk pos ini
               </p>
             </div>
@@ -1360,10 +1360,10 @@ export default function BudgetPlanningPage() {
                       Estimasi Sisa Kuota Belanja:
                     </span>
                     <span
-                      className={`font-bold font-mono ${
+                      className={`font-bold ${
                         diff >= 0
-                          ? 'text-emerald-600 dark:text-emerald-400'
-                          : 'text-rose-600 dark:text-rose-400'
+                          ? 'text-income'
+                          : 'text-expense'
                       }`}
                     >
                       {diff >= 0 ? '+' : ''}
@@ -1374,7 +1374,7 @@ export default function BudgetPlanningPage() {
                     <span className="text-gray-600 dark:text-gray-400">
                       Estimasi Penyerapan:
                     </span>
-                    <span className="font-bold font-mono text-gray-800 dark:text-gray-200">
+                    <span className="font-bold text-gray-800 dark:text-gray-200">
                       {pct}%
                     </span>
                   </div>
@@ -1394,7 +1394,7 @@ export default function BudgetPlanningPage() {
               <button
                 type="submit"
                 disabled={savingQuickEdit}
-                className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors disabled:opacity-50 text-sm shadow cursor-pointer"
+                className="flex-1 px-4 py-2 bg-brand-primary hover:bg-brand-primary-hover text-white rounded-lg font-semibold transition-colors disabled:opacity-50 text-sm shadow cursor-pointer"
               >
                 {savingQuickEdit ? 'Menyimpan...' : '✓ Simpan Target'}
               </button>

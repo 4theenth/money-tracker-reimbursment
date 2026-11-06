@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { deleteReimbursement, setReimbursementStatus } from '@/lib/reimbursements'
 
 type Params = {
   params: Promise<{
@@ -56,10 +57,13 @@ export async function PUT(request: NextRequest, context: Params) {
     if (receiptPhoto !== undefined) data.receiptPhoto = receiptPhoto
     if (notes !== undefined) data.notes = notes
     if (status !== undefined) {
-      data.status = status
-      if (status === 'claimed') {
-        data.claimedAt = new Date()
+      if (status !== 'pending' && status !== 'paid') {
+        return NextResponse.json(
+          { error: 'Invalid status. Must be "pending" or "paid"' },
+          { status: 400 }
+        )
       }
+      await setReimbursementStatus(id, status)
     }
 
     const reimbursement = await prisma.reimbursement.update({
@@ -91,9 +95,7 @@ export async function DELETE(request: NextRequest, context: Params) {
     const params = await context.params
     const id = parseInt(params.id)
 
-    await prisma.reimbursement.delete({
-      where: { id },
-    })
+    await deleteReimbursement(id)
 
     return NextResponse.json({ message: 'Reimbursement deleted successfully' })
   } catch (error) {

@@ -152,7 +152,8 @@ export default function TransaksiPage() {
           })
 
           if (!res.ok) {
-            showError('Gagal mengupdate transaksi')
+            const error = await res.json().catch(() => null)
+            showError(error?.error || 'Gagal mengupdate transaksi')
             return
           }
 
@@ -251,13 +252,13 @@ export default function TransaksiPage() {
   const isReimbursementCategory = selectedCategory?.name === 'Reimbursement Kantor'
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4 md:p-8">
+    <div className="min-h-screen bg-paper p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-6">
           <a
             href="/"
-            className="inline-flex items-center gap-2 text-brand-primary hover:text-brand-primary-hover font-medium mb-4 transition-colors"
+            className="inline-flex items-center gap-2 text-accent hover:text-accent-hover font-medium mb-4 transition-colors"
           >
             ← Kembali ke Dashboard
           </a>
@@ -284,7 +285,7 @@ export default function TransaksiPage() {
                 notes: '',
               })
             }}
-            className="bg-brand-primary hover:bg-brand-primary-hover text-white px-6 py-3 rounded-lg font-semibold shadow-lg transition-colors"
+            className="bg-brand-primary hover:bg-brand-primary-hover text-white px-6 py-3 rounded-lg font-semibold shadow-sm transition-colors"
           >
             + Tambah Transaksi
           </button>
@@ -316,7 +317,7 @@ export default function TransaksiPage() {
                       value={formData.date}
                       onChange={(e) => setFormData({ ...formData, date: e.target.value })}
                       required
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent dark:bg-gray-700 dark:text-white"
                     />
                   </div>
 
@@ -331,7 +332,7 @@ export default function TransaksiPage() {
                         onClick={() => setFormData({ ...formData, type: 'income', categoryId: '' })}
                         className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                           formData.type === 'income'
-                            ? 'bg-green-600 text-white'
+                            ? 'bg-income-solid text-white'
                             : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
                         }`}
                       >
@@ -342,7 +343,7 @@ export default function TransaksiPage() {
                         onClick={() => setFormData({ ...formData, type: 'expense', categoryId: '' })}
                         className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                           formData.type === 'expense'
-                            ? 'bg-red-600 text-white'
+                            ? 'bg-expense-solid text-white'
                             : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
                         }`}
                       >
@@ -360,7 +361,7 @@ export default function TransaksiPage() {
                       value={formData.categoryId}
                       onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
                       required
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent dark:bg-gray-700 dark:text-white"
                     >
                       <option value="">Pilih Kategori</option>
                       {currentCategories.map((cat) => (
@@ -390,7 +391,7 @@ export default function TransaksiPage() {
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                       required
                       rows={3}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent dark:bg-gray-700 dark:text-white"
                       placeholder="Contoh: Gaji bulan Oktober"
                     />
                   </div>
@@ -407,7 +408,7 @@ export default function TransaksiPage() {
                       required
                       min="0"
                       step="0.01"
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent dark:bg-gray-700 dark:text-white"
                       placeholder="0"
                     />
                   </div>
@@ -439,7 +440,7 @@ export default function TransaksiPage() {
                     </button>
                     <button
                       type="submit"
-                      className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50"
+                      className="flex-1 px-4 py-2 bg-brand-primary hover:bg-brand-primary-hover text-white rounded-lg font-medium transition-colors disabled:opacity-50"
                     >
                       {editingId ? 'Update' : 'Simpan'}
                     </button>
@@ -448,7 +449,7 @@ export default function TransaksiPage() {
               </Modal>
 
         {/* Filters */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 mb-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -499,7 +500,7 @@ export default function TransaksiPage() {
         </div>
 
         {/* Transactions List */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-gray-50 dark:bg-gray-700">
@@ -530,13 +531,13 @@ export default function TransaksiPage() {
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                 {loading ? (
                   <tr>
-                    <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
+                    <td colSpan={7} className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
                       Loading...
                     </td>
                   </tr>
                 ) : transactions.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
+                    <td colSpan={7} className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
                       <div className="text-4xl mb-2">📝</div>
                       <p>Belum ada transaksi</p>
                     </td>
@@ -560,7 +561,7 @@ export default function TransaksiPage() {
                           {transaction.description}
                         </div>
                         {transaction.savingsLocation && (
-                          <div className="inline-flex items-center gap-1 mt-1 text-xs text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded-full font-normal">
+                          <div className="inline-flex items-center gap-1 mt-1 text-xs text-accent bg-status-info-light bg-status-info-light px-2 py-0.5 rounded-full font-normal">
                             <span>{transaction.savingsLocation.toLowerCase().includes('tunai') ? '💵' : '🏦'}</span>
                             <span>{transaction.savingsLocation}</span>
                           </div>
@@ -568,20 +569,20 @@ export default function TransaksiPage() {
                       </td>
                       <td className="px-4 py-3 text-sm text-right">
                         {transaction.income > 0 ? (
-                          <span className="text-green-600 font-semibold">
+                          <span className="text-income font-semibold">
                             {formatCurrency(transaction.income)}
                           </span>
                         ) : (
-                          <span className="text-gray-400">-</span>
+                          <span className="text-gray-500 dark:text-gray-400">-</span>
                         )}
                       </td>
                       <td className="px-4 py-3 text-sm text-right">
                         {transaction.expense > 0 ? (
-                          <span className="text-red-600 font-semibold">
+                          <span className="text-expense font-semibold">
                             {formatCurrency(transaction.expense)}
                           </span>
                         ) : (
-                          <span className="text-gray-400">-</span>
+                          <span className="text-gray-500 dark:text-gray-400">-</span>
                         )}
                       </td>
                       <td className="px-4 py-3 text-sm text-right">
@@ -593,13 +594,13 @@ export default function TransaksiPage() {
                         <div className="flex items-center justify-center gap-2">
                           <button
                             onClick={() => handleEdit(transaction)}
-                            className="text-blue-600 hover:text-blue-800 font-medium"
+                            className="text-accent hover:text-accent-hover font-medium"
                           >
                             Edit
                           </button>
                           <button
                             onClick={() => handleDelete(transaction.id)}
-                            className="text-red-600 hover:text-red-800 font-medium"
+                            className="text-expense hover:text-expense font-medium"
                           >
                             Hapus
                           </button>

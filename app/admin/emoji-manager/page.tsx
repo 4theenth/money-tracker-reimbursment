@@ -143,7 +143,7 @@ export default function EmojiManagerPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4 md:p-8">
+    <div className="min-h-screen bg-paper p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-6">
@@ -163,12 +163,12 @@ export default function EmojiManagerPage() {
 
         {loading ? (
           <div className="text-center py-12">
-            <p className="text-gray-500">Loading...</p>
+            <p className="text-gray-500 dark:text-gray-400">Loading...</p>
           </div>
         ) : (
           <>
             {/* Current Collection */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-bold text-gray-800 dark:text-white">
                   Current Collection
@@ -189,7 +189,7 @@ export default function EmojiManagerPage() {
                     </div>
                     <button
                       onClick={() => handleRemoveEmoji(emoji)}
-                      className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 text-xs opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                      className="absolute -top-1 -right-1 bg-expense-solid text-white rounded-full w-5 h-5 text-xs opacity-0 group-hover:opacity-100 transition-opacity hover:bg-expense-solid-hover"
                       title="Remove"
                     >
                       ×
@@ -200,7 +200,7 @@ export default function EmojiManagerPage() {
             </div>
 
             {/* Add Emoji (Single or Bulk) */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
               <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-4">
                 Add Emoji (Single or Multiple)
               </h2>
@@ -214,7 +214,7 @@ export default function EmojiManagerPage() {
                     }
                   }}
                   placeholder="Paste emoji here... 🚀 or multiple: 🍕 🍔 🍟 🥤 🍿"
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-purple-500 text-xl h-24 resize-none"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-accent text-xl h-24 resize-none"
                 />
                 <button
                   onClick={handleAddEmoji}
@@ -227,7 +227,7 @@ export default function EmojiManagerPage() {
                 💡 Tip: Paste 1 emoji untuk single add, atau multiple emoji untuk bulk import.
                 <br />
                 Windows: Win + . | Mac: Cmd + Ctrl + Space | Web:{' '}
-                <a href="https://emojipedia.org" target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:underline">
+                <a href="https://emojipedia.org" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">
                   Emojipedia
                 </a>
                 <br />
@@ -236,14 +236,14 @@ export default function EmojiManagerPage() {
             </div>
 
             {/* Actions */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
               <div className="flex flex-wrap gap-3">
                 <button
                   onClick={handleSaveChanges}
                   disabled={saving}
                   className={`flex-1 px-6 py-3 rounded-lg font-semibold transition-all ${
                     hasUnsavedChanges
-                      ? 'bg-action-save hover:bg-action-save-hover text-white animate-pulse shadow-lg shadow-action-save/50'
+                      ? 'bg-action-save hover:bg-action-save-hover text-white animate-pulse shadow-sm shadow-action-save/50'
                       : 'bg-action-save hover:bg-action-save-hover text-white'
                   } disabled:bg-action-cancel disabled:animate-none`}
                 >

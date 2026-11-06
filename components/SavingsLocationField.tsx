@@ -112,17 +112,17 @@ export default function SavingsLocationField({
   }
 
   return (
-    <div className={`bg-blue-50/70 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/50 p-4 rounded-lg space-y-3 ${className}`}>
+    <div className={`bg-status-info-light bg-status-info-light border border-accent/30 p-4 rounded-lg space-y-3 ${className}`}>
       {/* Header with Title & Add button */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-blue-700 dark:text-blue-300 font-semibold text-sm">
+        <div className="flex items-center gap-2 text-accent font-semibold text-sm">
           <span>{title}</span>
         </div>
         {!isAddingNew && (
           <button
             type="button"
             onClick={() => setIsAddingNew(true)}
-            className="text-xs text-blue-600 dark:text-blue-400 hover:underline font-medium flex items-center gap-1"
+            className="text-xs text-accent hover:underline font-medium flex items-center gap-1"
           >
             + Tambah Rekening
           </button>
@@ -131,7 +131,7 @@ export default function SavingsLocationField({
 
       {/* Inline Add New Form */}
       {isAddingNew && (
-        <div className="bg-white dark:bg-gray-800 p-3 rounded-lg border border-blue-300 dark:border-blue-700 space-y-2">
+        <div className="bg-white dark:bg-gray-800 p-3 rounded-lg border border-accent/30 space-y-2">
           <label className="block text-xs font-medium text-gray-700 dark:text-gray-300">
             Nama Rekening / Akun Baru <span className="text-status-danger font-bold">*</span>:
           </label>
@@ -141,7 +141,7 @@ export default function SavingsLocationField({
               value={newLocationName}
               onChange={(e) => setNewLocationName(e.target.value)}
               placeholder="Contoh: Bank Jago, Gopay, dll"
-              className="flex-1 px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="flex-1 px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-1 focus:ring-accent"
               autoFocus
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
@@ -154,7 +154,7 @@ export default function SavingsLocationField({
               type="button"
               onClick={handleAddNewLocation}
               disabled={savingNew}
-              className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-lg disabled:opacity-50"
+              className="px-3 py-1.5 bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-medium rounded-lg disabled:opacity-50"
             >
               {savingNew ? 'Menyimpan...' : 'Simpan'}
             </button>
@@ -186,7 +186,7 @@ export default function SavingsLocationField({
             value={value || (locations[0] || 'Tunai / Dompet')}
             onChange={(e) => onChange(e.target.value)}
             required={required}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white text-sm font-medium"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent dark:bg-gray-800 dark:text-white text-sm font-medium"
           >
             {locations.map((loc) => (
               <option key={loc} value={loc}>

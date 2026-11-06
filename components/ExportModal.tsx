@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Modal from './Modal'
+import DateRangePicker from './DateRangePicker'
 import { useNotification } from '@/contexts/NotificationContext'
 import { formatLocalDate } from '@/lib/utils'
 
@@ -40,10 +41,15 @@ export default function ExportModal({ isOpen, onClose, onExport, onManageCompani
   const [selectedCompanyId, setSelectedCompanyId] = useState<number | null>(null)
   const [requestorName, setRequestorName] = useState('')
   const [includeApproval, setIncludeApproval] = useState(false)
+  // Export period: starts from the page's filter but is edited independently of it
+  const [exportStartDate, setExportStartDate] = useState(startDate)
+  const [exportEndDate, setExportEndDate] = useState(endDate)
 
   // Load companies on mount
   useEffect(() => {
     if (isOpen) {
+      setExportStartDate(startDate)
+      setExportEndDate(endDate)
       loadData()
     }
   }, [isOpen])
@@ -108,8 +114,8 @@ export default function ExportModal({ isOpen, onClose, onExport, onManageCompani
       companyLogo: selectedCompany.logoPath,
       requestorName,
       includeApproval,
-      startDate: formatLocalDate(startDate),
-      endDate: formatLocalDate(endDate)
+      startDate: formatLocalDate(exportStartDate),
+      endDate: formatLocalDate(exportEndDate)
     }
 
     // Save to localStorage for next time
@@ -208,18 +214,24 @@ export default function ExportModal({ isOpen, onClose, onExport, onManageCompani
               />
             </div>
 
-            {/* Period Summary (replaces month selector) */}
+            {/* Export Period */}
             <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Periode Export
-              </label>
-              <p className="text-base font-semibold text-blue-700 dark:text-blue-300">
-                {startDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
-                {' '} - {' '}
-                {endDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
               </p>
-              <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                Sesuaikan periode di halaman utama jika perlu
+              <DateRangePicker
+                startDate={exportStartDate}
+                endDate={exportEndDate}
+                onStartDateChange={setExportStartDate}
+                onEndDateChange={setExportEndDate}
+                onQuickFilter={(start, end) => {
+                  setExportStartDate(start)
+                  setExportEndDate(end)
+                }}
+                calendarPortalId="export-modal-calendar"
+              />
+              <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">
+                Hanya berlaku untuk export ini, filter di halaman utama tidak berubah
               </p>
             </div>
 
