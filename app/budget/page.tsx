@@ -6,6 +6,7 @@ import { CATEGORY_NAME_MAX_LENGTH } from '@/lib/category-name'
 import { useNotification } from '@/contexts/NotificationContext'
 import { emojiOptions } from '@/lib/config/emojis'
 import Modal from '@/components/Modal'
+import Select from '@/components/ui/Select'
 
 interface BudgetItemDetail {
   id?: number
@@ -548,40 +549,43 @@ export default function BudgetPlanningPage() {
 
         {/* Filter Bar */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-6">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="flex flex-wrap items-center gap-4">
-              <div className="flex items-center gap-2">
-                <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                  Periode:
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full sm:w-auto sm:min-w-[360px]">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Periode Bulan
                 </label>
-                <select
+                <Select
                   value={selectedMonth}
-                  onChange={(e) => setSelectedMonth(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white text-sm font-medium focus:ring-2 focus:ring-accent"
-                >
-                  {months.map((m) => (
-                    <option key={m.value} value={m.value}>
-                      {m.label}
-                    </option>
-                  ))}
-                </select>
-                <select
+                  onChange={(value) => setSelectedMonth(value)}
+                  searchable={true}
+                  searchPlaceholder="Cari bulan..."
+                  options={months.map((m) => ({
+                    value: m.value,
+                    label: m.label,
+                    icon: '📅',
+                  }))}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Periode Tahun
+                </label>
+                <Select
                   value={selectedYear}
-                  onChange={(e) => setSelectedYear(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white text-sm font-medium focus:ring-2 focus:ring-accent"
-                >
-                  {years.map((y) => (
-                    <option key={y} value={y}>
-                      {y}
-                    </option>
-                  ))}
-                </select>
+                  onChange={(value) => setSelectedYear(value)}
+                  options={years.map((y) => ({
+                    value: y,
+                    label: y,
+                    icon: '🗓️',
+                  }))}
+                />
               </div>
             </div>
 
             {/* Configured Status Tag */}
             {data && (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 sm:pb-1">
                 {data.period.isConfigured ? (
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-status-success-light text-income bg-status-success-light">
                     <span className="w-2 h-2 rounded-full bg-income"></span>

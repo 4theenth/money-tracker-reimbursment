@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useNotification } from '@/contexts/NotificationContext'
+import Select from '@/components/ui/Select'
 
 interface SavingsLocationFieldProps {
   value: string
@@ -182,18 +183,19 @@ export default function SavingsLocationField({
             Memuat daftar rekening...
           </div>
         ) : (
-          <select
+          <Select
             value={value || (locations[0] || 'Tunai / Dompet')}
-            onChange={(e) => onChange(e.target.value)}
+            onChange={(val) => onChange(val)}
             required={required}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent dark:bg-gray-800 dark:text-white text-sm font-medium"
-          >
-            {locations.map((loc) => (
-              <option key={loc} value={loc}>
-                {getAccountIcon(loc)} {loc}
-              </option>
-            ))}
-          </select>
+            size="sm"
+            triggerClassName="dark:bg-gray-800 font-medium py-2"
+            searchPlaceholder="Cari rekening..."
+            options={locations.map((loc) => ({
+              value: loc,
+              label: loc,
+              icon: getAccountIcon(loc),
+            }))}
+          />
         )}
         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
           {helperText}

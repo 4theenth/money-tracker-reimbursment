@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import { formatCurrency, formatDate, formatLocalDate } from '@/lib/utils'
 import { useNotification } from '@/contexts/NotificationContext'
 import Modal from '@/components/Modal'
+import Select from '@/components/ui/Select'
+import DatePickerInput from '@/components/ui/DatePickerInput'
 import ReimbursementFormFields from '@/components/ReimbursementFormFields'
 import SavingsLocationField from '@/components/SavingsLocationField'
 
@@ -306,12 +308,10 @@ export default function TransaksiPage() {
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Tanggal <span className="text-status-danger font-bold">*</span>
                     </label>
-                    <input
-                      type="date"
+                    <DatePickerInput
                       value={formData.date}
-                      onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                      onChange={(value) => setFormData({ ...formData, date: value })}
                       required
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent dark:bg-gray-700 dark:text-white"
                     />
                   </div>
 
@@ -351,19 +351,18 @@ export default function TransaksiPage() {
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Kategori <span className="text-status-danger font-bold">*</span>
                     </label>
-                    <select
+                    <Select
                       value={formData.categoryId}
-                      onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
+                      onChange={(value) => setFormData({ ...formData, categoryId: value })}
                       required
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent dark:bg-gray-700 dark:text-white"
-                    >
-                      <option value="">Pilih Kategori</option>
-                      {currentCategories.map((cat) => (
-                        <option key={cat.id} value={cat.id}>
-                          {cat.icon} {cat.name}
-                        </option>
-                      ))}
-                    </select>
+                      placeholder="Pilih Kategori"
+                      searchPlaceholder="Cari kategori..."
+                      options={currentCategories.map((cat) => ({
+                        value: cat.id.toString(),
+                        label: cat.name,
+                        icon: cat.icon,
+                      }))}
+                    />
                   </div>
 
                   {/* Savings Location / Payment Source */}
@@ -449,33 +448,36 @@ export default function TransaksiPage() {
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Filter Tipe
               </label>
-              <select
+              <Select
                 value={filters.type}
-                onChange={(e) => setFilters({ ...filters, type: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
-              >
-                <option value="">Semua</option>
-                <option value="income">Pemasukan</option>
-                <option value="expense">Pengeluaran</option>
-              </select>
+                onChange={(value) => setFilters({ ...filters, type: value })}
+                placeholder="Semua"
+                options={[
+                  { value: '', label: 'Semua' },
+                  { value: 'income', label: 'Pemasukan', icon: '📈' },
+                  { value: 'expense', label: 'Pengeluaran', icon: '📉' },
+                ]}
+              />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Filter Kategori
               </label>
-              <select
+              <Select
                 value={filters.categoryId}
-                onChange={(e) => setFilters({ ...filters, categoryId: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
-              >
-                <option value="">Semua Kategori</option>
-                {categories.map((cat) => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.icon} {cat.name}
-                  </option>
-                ))}
-              </select>
+                onChange={(value) => setFilters({ ...filters, categoryId: value })}
+                placeholder="Semua Kategori"
+                searchPlaceholder="Cari kategori..."
+                options={[
+                  { value: '', label: 'Semua Kategori' },
+                  ...categories.map((cat) => ({
+                    value: cat.id.toString(),
+                    label: cat.name,
+                    icon: cat.icon,
+                  })),
+                ]}
+              />
             </div>
 
             <div>
