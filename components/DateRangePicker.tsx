@@ -1,9 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import DatePicker from 'react-datepicker'
-import 'react-datepicker/dist/react-datepicker.css'
-import './DateRangePicker.css'
+import DatePickerInput from '@/components/ui/DatePickerInput'
 
 interface Props {
   startDate: Date
@@ -113,48 +111,30 @@ export default function DateRangePicker({
   return (
     <div className="space-y-3">
       {/* Date Pickers */}
-      <div className="flex items-center gap-3">
-        <div className="flex-1">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+        <div className="flex-1 min-w-0">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Tanggal Mulai
           </label>
-          <DatePicker
-            selected={startDate}
-            onChange={handleStartChange}
-            portalId={calendarPortalId}
-            dateFormat="dd/MM/yyyy"
-            showMonthDropdown
-            showYearDropdown
-            dropdownMode="select"
-            yearDropdownItemNumber={50}
-            scrollableYearDropdown
-            className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-accent"
-            calendarClassName="custom-datepicker"
-            wrapperClassName="w-full"
+          <DatePickerInput
+            selectedDate={startDate}
+            onDateChange={handleStartChange}
+            ariaLabel="Tanggal Mulai"
           />
         </div>
 
-        <div className="flex items-center justify-center pt-6">
+        <div className="hidden sm:flex items-center justify-center pt-6">
           <span aria-hidden="true" className="text-ink-muted">→</span>
         </div>
 
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Tanggal Akhir
           </label>
-          <DatePicker
-            selected={endDate}
-            onChange={handleEndChange}
-            portalId={calendarPortalId}
-            dateFormat="dd/MM/yyyy"
-            showMonthDropdown
-            showYearDropdown
-            dropdownMode="select"
-            yearDropdownItemNumber={50}
-            scrollableYearDropdown
-            className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-accent"
-            calendarClassName="custom-datepicker"
-            wrapperClassName="w-full"
+          <DatePickerInput
+            selectedDate={endDate}
+            onDateChange={handleEndChange}
+            ariaLabel="Tanggal Akhir"
           />
         </div>
       </div>

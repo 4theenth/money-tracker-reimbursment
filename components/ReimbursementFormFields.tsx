@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import ImageUpload from '@/components/ImageUpload'
+import Select from '@/components/ui/Select'
 import { useNotification } from '@/contexts/NotificationContext'
 
 interface ReimbursementCategory {
@@ -75,19 +76,18 @@ export default function ReimbursementFormFields({
             Memuat kategori...
           </div>
         ) : (
-          <select
+          <Select
             value={officeCategoryId}
-            onChange={(e) => onOfficeCategoryChange(e.target.value)}
+            onChange={(val) => onOfficeCategoryChange(val)}
             required={required}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent dark:bg-gray-700 dark:text-white"
-          >
-            <option value="">Pilih Kategori Kantor</option>
-            {categories.map((cat) => (
-              <option key={cat.id} value={cat.id}>
-                {cat.icon} {cat.name}
-              </option>
-            ))}
-          </select>
+            placeholder="Pilih Kategori Kantor"
+            searchPlaceholder="Cari kategori kantor..."
+            options={categories.map((cat) => ({
+              value: cat.id.toString(),
+              label: cat.name,
+              icon: cat.icon,
+            }))}
+          />
         )}
       </div>
 

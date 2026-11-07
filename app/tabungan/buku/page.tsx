@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { useNotification } from '@/contexts/NotificationContext'
+import Select from '@/components/ui/Select'
 
 interface Transaction {
   id: number
@@ -186,56 +187,67 @@ export default function BukuTabunganPage() {
 
         {/* Filters */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-6 print:hidden">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="flex flex-wrap items-center gap-4">
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 flex-1">
               {/* Account Filter */}
-              <div className="flex flex-wrap items-center gap-2 max-w-full">
-                <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                  Rekening:
+              <div className="sm:col-span-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Filter Rekening
                 </label>
-                <select
+                <Select
                   value={selectedLocation}
-                  onChange={(e) => setSelectedLocation(e.target.value)}
-                  className="max-w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white text-sm font-medium focus:ring-2 focus:ring-accent"
-                >
-                  <option value="all">🌐 Semua Akun (Kas Tunai & Bank)</option>
-                  <option value="savings">🏦 Semua Rekening Bank Saja</option>
-                  {locations.map((loc) => (
-                    <option key={loc} value={loc}>
-                      {loc.toLowerCase().includes('tunai') ? '💵' : '🏦'} {loc}
-                    </option>
-                  ))}
-                </select>
+                  onChange={(value) => setSelectedLocation(value)}
+                  searchable={true}
+                  searchPlaceholder="Cari rekening..."
+                  options={[
+                    { value: 'all', label: 'Semua Akun (Kas Tunai & Bank)', icon: '🌐' },
+                    { value: 'savings', label: 'Semua Rekening Bank Saja', icon: '🏦' },
+                    ...locations.map((loc) => ({
+                      value: loc,
+                      label: loc,
+                      icon: loc.toLowerCase().includes('tunai') ? '💵' : '🏦',
+                    })),
+                  ]}
+                />
               </div>
 
-              {/* Period Filter */}
-              <div className="flex items-center gap-2">
-                <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                  Periode:
+              {/* Month Filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Periode Bulan
                 </label>
-                <select
+                <Select
                   value={selectedMonth}
-                  onChange={(e) => setSelectedMonth(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white text-sm"
-                >
-                  {months.map(m => (
-                    <option key={m.value} value={m.value}>{m.label}</option>
-                  ))}
-                </select>
-                <select
+                  onChange={(value) => setSelectedMonth(value)}
+                  searchable={true}
+                  searchPlaceholder="Cari bulan..."
+                  options={months.map((m) => ({
+                    value: m.value,
+                    label: m.label,
+                    icon: '📅',
+                  }))}
+                />
+              </div>
+
+              {/* Year Filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Periode Tahun
+                </label>
+                <Select
                   value={selectedYear}
-                  onChange={(e) => setSelectedYear(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white text-sm"
-                >
-                  {years.map(y => (
-                    <option key={y} value={y}>{y}</option>
-                  ))}
-                </select>
+                  onChange={(value) => setSelectedYear(value)}
+                  options={years.map((y) => ({
+                    value: y,
+                    label: y,
+                    icon: '🗓️',
+                  }))}
+                />
               </div>
             </div>
 
             {/* Action Buttons */}
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2 lg:pb-0.5">
               <button
                 type="button"
                 onClick={handleExportExcel}

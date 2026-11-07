@@ -8,6 +8,8 @@ import ImageUpload from '@/components/ImageUpload'
 import ExportModal from '@/components/ExportModal'
 import CompanyManagementModal from '@/components/CompanyManagementModal'
 import DateRangePicker from '@/components/DateRangePicker'
+import Select from '@/components/ui/Select'
+import DatePickerInput from '@/components/ui/DatePickerInput'
 
 interface ReimbursementCategory {
   id: number
@@ -355,15 +357,16 @@ export default function ReimbursementPage() {
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Status
               </label>
-              <select
+              <Select
                 value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent dark:bg-gray-700 dark:text-white"
-              >
-                <option value="">Semua Status</option>
-                <option value="pending">Menunggu Dibayar</option>
-                <option value="paid">Sudah Dibayar</option>
-              </select>
+                onChange={(value) => setStatusFilter(value)}
+                placeholder="Semua Status"
+                options={[
+                  { value: '', label: 'Semua Status' },
+                  { value: 'pending', label: 'Menunggu Dibayar', icon: '⏳' },
+                  { value: 'paid', label: 'Sudah Dibayar', icon: '✅' },
+                ]}
+              />
             </div>
           </div>
         </div>
@@ -587,11 +590,9 @@ export default function ReimbursementPage() {
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Tanggal <span className="text-status-danger font-bold">*</span>
                   </label>
-                  <input
-                    type="date"
+                  <DatePickerInput
                     value={formData.date}
-                    onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent dark:bg-gray-700 dark:text-white"
+                    onChange={(value) => setFormData({ ...formData, date: value })}
                     required
                   />
                 </div>
@@ -601,19 +602,18 @@ export default function ReimbursementPage() {
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Kategori Kantor <span className="text-status-danger font-bold">*</span>
                   </label>
-                  <select
+                  <Select
                     value={formData.officeCategoryId}
-                    onChange={(e) => setFormData({ ...formData, officeCategoryId: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent dark:bg-gray-700 dark:text-white"
+                    onChange={(value) => setFormData({ ...formData, officeCategoryId: value })}
                     required
-                  >
-                    <option value="">Pilih Kategori...</option>
-                    {reimbursementCategories.map((cat) => (
-                      <option key={cat.id} value={cat.id}>
-                        {cat.icon} {cat.name}
-                      </option>
-                    ))}
-                  </select>
+                    placeholder="Pilih Kategori..."
+                    searchPlaceholder="Cari kategori kantor..."
+                    options={reimbursementCategories.map((cat) => ({
+                      value: cat.id.toString(),
+                      label: cat.name,
+                      icon: cat.icon,
+                    }))}
+                  />
                 </div>
 
                 {/* Description */}

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Modal from './Modal'
 import DateRangePicker from './DateRangePicker'
+import Select from '@/components/ui/Select'
 import { useNotification } from '@/contexts/NotificationContext'
 import { formatLocalDate } from '@/lib/utils'
 
@@ -161,18 +162,17 @@ export default function ExportModal({ isOpen, onClose, onExport, onManageCompani
                 </div>
               ) : (
                 <>
-                  <select
-                    value={selectedCompanyId || ''}
-                    onChange={(e) => setSelectedCompanyId(parseInt(e.target.value))}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent dark:bg-gray-700 dark:text-white"
-                  >
-                    <option value="">-- Pilih Perusahaan --</option>
-                    {companies.map((company) => (
-                      <option key={company.id} value={company.id}>
-                        {company.name} {company.isDefault ? '⭐' : ''}
-                      </option>
-                    ))}
-                  </select>
+                  <Select
+                    value={selectedCompanyId ? selectedCompanyId.toString() : ''}
+                    onChange={(val) => setSelectedCompanyId(val ? parseInt(val) : null)}
+                    placeholder="-- Pilih Perusahaan --"
+                    searchPlaceholder="Cari perusahaan..."
+                    options={companies.map((company) => ({
+                      value: company.id.toString(),
+                      label: `${company.name}${company.isDefault ? ' ⭐' : ''}`,
+                      icon: '🏢',
+                    }))}
+                  />
 
                   {/* Logo Preview */}
                   {selectedCompany && selectedCompany.logoPath && (
