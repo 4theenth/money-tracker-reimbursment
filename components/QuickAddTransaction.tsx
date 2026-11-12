@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation'
 import { useNotification } from '@/contexts/NotificationContext'
 import { formatLocalDate } from '@/lib/utils'
 import Modal from '@/components/Modal'
+import Select from '@/components/ui/Select'
+import DatePickerInput from '@/components/ui/DatePickerInput'
 import ReimbursementFormFields from '@/components/ReimbursementFormFields'
 import SavingsLocationField from '@/components/SavingsLocationField'
 
@@ -27,7 +29,7 @@ export default function QuickAddTransaction({ onSuccess }: QuickAddProps) {
   const [loading, setLoading] = useState(false)
 
   const [formData, setFormData] = useState({
-    date: new Date().toISOString().split('T')[0],
+    date: formatLocalDate(new Date()),
     categoryId: '',
     description: '',
     type: 'expense',
@@ -118,7 +120,7 @@ export default function QuickAddTransaction({ onSuccess }: QuickAddProps) {
 
       // Reset form
       setFormData({
-        date: new Date().toISOString().split('T')[0],
+        date: formatLocalDate(new Date()),
         categoryId: '',
         description: '',
         type: 'expense',
@@ -185,12 +187,10 @@ export default function QuickAddTransaction({ onSuccess }: QuickAddProps) {
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Tanggal <span className="text-status-danger font-bold">*</span>
                   </label>
-                  <input
-                    type="date"
+                  <DatePickerInput
                     value={formData.date}
-                    onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                    onChange={(value) => setFormData({ ...formData, date: value })}
                     required
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent dark:bg-gray-700 dark:text-white"
                   />
                 </div>
 
@@ -230,19 +230,18 @@ export default function QuickAddTransaction({ onSuccess }: QuickAddProps) {
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Kategori <span className="text-status-danger font-bold">*</span>
                   </label>
-                  <select
+                  <Select
                     value={formData.categoryId}
-                    onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
+                    onChange={(value) => setFormData({ ...formData, categoryId: value })}
                     required
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent dark:bg-gray-700 dark:text-white"
-                  >
-                    <option value="">Pilih Kategori</option>
-                    {currentCategories.map((cat) => (
-                      <option key={cat.id} value={cat.id}>
-                        {cat.icon} {cat.name}
-                      </option>
-                    ))}
-                  </select>
+                    placeholder="Pilih Kategori"
+                    searchPlaceholder="Cari kategori..."
+                    options={currentCategories.map((cat) => ({
+                      value: cat.id.toString(),
+                      label: cat.name,
+                      icon: cat.icon,
+                    }))}
+                  />
                 </div>
 
                 {/* Sumber Dana / Rekening Pembayaran */}
